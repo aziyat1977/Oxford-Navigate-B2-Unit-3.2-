@@ -142,7 +142,7 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
     <motion.div 
       key="intro" 
       exit={{opacity: 0, scale: 1.1}} 
-      className="flex flex-col items-center justify-center h-full w-full cursor-pointer p-6 text-center"
+      className="flex flex-col items-center justify-center h-full w-full cursor-pointer p-6 text-center relative"
       onClick={() => setPhase('ritual')}
     >
       <div className="flex-1 flex flex-col items-center justify-center">
@@ -157,8 +157,8 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
             "Unit 3.2: The Future Perfect & Continuous"
         </h3>
       </div>
-      <div className="animate-pulse text-crimson dark:text-emerald-rune font-display font-bold text-2xl mb-12">
-          TAP TO ENTER
+      <div className="absolute bottom-10 left-10 animate-pulse text-crimson dark:text-emerald-rune font-display font-bold text-3xl">
+          TAP TO ENTER [ ↵ ]
       </div>
     </motion.div>
   );
@@ -204,8 +204,8 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
           </svg>
       </div>
       
-      <p className="mt-12 font-rune text-xl text-ink/60 dark:text-parchment/60 animate-pulse">
-          {isHolding ? "Syncing Temporal Data..." : "Hold to Initialize"}
+      <p className="absolute bottom-10 left-10 font-rune text-xl text-ink/60 dark:text-parchment/60 animate-pulse">
+          {isHolding ? "Syncing Temporal Data..." : "Hold Orb to Initialize"}
       </p>
     </motion.div>
   );

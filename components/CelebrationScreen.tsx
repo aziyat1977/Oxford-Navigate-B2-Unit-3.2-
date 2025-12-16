@@ -56,7 +56,7 @@ const CelebrationScreen: React.FC<CelebrationProps> = ({ badge, title, subtitle,
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 1 }}
         onClick={() => { playSound('click'); onNext(); }}
-        className="z-10 relative px-10 py-4 bg-ink dark:bg-magic-gold text-parchment dark:text-ink font-display font-bold text-xl rounded-sm border-2 border-magic-gold hover:scale-105 active:scale-95 transition-all shadow-xl group overflow-hidden cursor-pointer"
+        className="absolute bottom-10 left-10 z-50 px-10 py-4 bg-ink dark:bg-magic-gold text-parchment dark:text-ink font-display font-bold text-xl rounded-sm border-2 border-magic-gold hover:scale-105 active:scale-95 transition-all shadow-xl group overflow-hidden cursor-pointer"
       >
         <span className="relative z-10">CONTINUE JOURNEY →</span>
         <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500"/>

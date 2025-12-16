@@ -195,19 +195,22 @@ const App = () => {
       case 'home':
         return (
           <ViewWrapper k="home">
-              <div className="flex flex-col items-center justify-center h-full text-center p-4">
-                <h1 className="text-5xl md:text-8xl font-display font-bold text-ink dark:text-parchment mb-6 drop-shadow-lg leading-tight">
-                    The Chronomancer's<br/>Codex
-                </h1>
-                <p className="font-body text-2xl italic text-ink/80 dark:text-parchment/80 max-w-md mx-auto mb-10">
-                "Time is the currency of the soul.<br/>Spend it wisely, Apprentice."
-                </p>
-                <div className="w-24 h-24 border-4 border-magic-gold rounded-full flex items-center justify-center animate-pulse">
-                    <span className="text-4xl">⏳</span>
+              <div className="flex flex-col items-center justify-center h-full text-center p-4 relative">
+                <div className="flex flex-col items-center justify-center flex-1">
+                    <h1 className="text-5xl md:text-8xl font-display font-bold text-ink dark:text-parchment mb-6 drop-shadow-lg leading-tight">
+                        The Chronomancer's<br/>Codex
+                    </h1>
+                    <p className="font-body text-2xl italic text-ink/80 dark:text-parchment/80 max-w-md mx-auto mb-10">
+                    "Time is the currency of the soul.<br/>Spend it wisely, Apprentice."
+                    </p>
+                    <div className="w-24 h-24 border-4 border-magic-gold rounded-full flex items-center justify-center animate-pulse">
+                        <span className="text-4xl">⏳</span>
+                    </div>
                 </div>
+                
                 <button 
                     onClick={() => handleLevelComplete('diagnostic')}
-                    className="mt-12 px-8 py-3 bg-ink dark:bg-magic-gold text-parchment dark:text-ink font-display font-bold text-xl rounded-sm hover:scale-105 transition-transform"
+                    className="absolute bottom-10 left-10 px-8 py-3 bg-ink dark:bg-magic-gold text-parchment dark:text-ink font-display font-bold text-xl rounded-sm hover:scale-105 transition-transform"
                 >
                     OPEN THE GRIMOIRE
                 </button>

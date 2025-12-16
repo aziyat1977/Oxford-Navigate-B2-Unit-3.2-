@@ -317,11 +317,11 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
          {slide === 2 && renderSpell()}
       </AnimatePresence>
 
-      {/* Bottom Control */}
-      <div className="absolute bottom-0 w-full p-8 flex justify-center z-50 pointer-events-none">
+      {/* Bottom Control - MOVED TO BOTTOM LEFT */}
+      <div className="absolute bottom-10 left-10 z-50 pointer-events-none">
           <button 
              onClick={nextStep}
-             className="pointer-events-auto px-16 py-6 bg-ink dark:bg-magic-gold text-parchment dark:text-ink font-display font-bold text-3xl rounded-sm hover:scale-105 transition-transform shadow-[0_0_30px_rgba(0,0,0,0.5)] border-2 border-parchment dark:border-ink"
+             className="pointer-events-auto px-12 py-5 bg-ink dark:bg-magic-gold text-parchment dark:text-ink font-display font-bold text-3xl rounded-sm hover:scale-105 transition-transform shadow-[0_0_30px_rgba(0,0,0,0.5)] border-2 border-parchment dark:border-ink"
           >
               {slide === 2 && currentTense === 'perfect' ? "COMPLETE CODEX" : "NEXT RUNE →"}
           </button>
