@@ -60,7 +60,6 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
 
   useEffect(() => {
     if (isHolding || progress > 0) {
-      // playSound('hover'); // Removed loop sound to prevent annoyance, using visual feedback instead
       requestRef.current = requestAnimationFrame(updateProgress);
     } else if (requestRef.current) {
       cancelAnimationFrame(requestRef.current);
@@ -203,7 +202,6 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
                      <button
                         key={i}
                         onClick={() => handleAnswer(i)}
-                        onMouseEnter={() => playSound('hover')}
                         className="group relative px-6 py-4 border-2 border-ink/20 dark:border-magic-gold/40 hover:border-magic-gold hover:bg-ink/5 dark:hover:bg-magic-gold/10 text-left transition-all active:scale-95 active:bg-ink/10 dark:active:bg-magic-gold/20"
                      >
                          <span className="font-display font-bold text-lg text-ink dark:text-parchment group-hover:text-crimson dark:group-hover:text-magic-gold transition-colors">{opt}</span>

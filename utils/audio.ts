@@ -14,111 +14,134 @@ export const initAudio = () => {
   }
 };
 
-export const playSound = (type: 'success' | 'error' | 'click' | 'hover' | 'swipe' | 'tick') => {
+// Helper: Create a noise buffer for texture sounds (paper sliding, wind)
+const createNoiseBuffer = (ctx: AudioContext) => {
+  const bufferSize = ctx.sampleRate * 2; // 2 seconds
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = Math.random() * 2 - 1;
+  }
+  return buffer;
+};
+
+export const playSound = (type: 'success' | 'error' | 'click' | 'swipe' | 'tick') => {
   const ctx = getContext();
   if (!ctx) return;
   
-  // Try to resume if suspended (though usually needs user gesture event)
   if (ctx.state === 'suspended') {
     ctx.resume().catch(() => {});
   }
 
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-  
   const now = ctx.currentTime;
-  
+  const masterGain = ctx.createGain();
+  masterGain.connect(ctx.destination);
+
   switch (type) {
     case 'success':
-      // Magical Major Arpeggio (C -> E -> G -> C)
-      const successOsc2 = ctx.createOscillator();
-      const successGain2 = ctx.createGain();
-      successOsc2.connect(successGain2);
-      successGain2.connect(ctx.destination);
-      
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(523.25, now); // C5
-      osc.frequency.linearRampToValueAtTime(659.25, now + 0.1); // E5
-      
-      successOsc2.type = 'triangle';
-      successOsc2.frequency.setValueAtTime(783.99, now + 0.1); // G5
-      successOsc2.frequency.linearRampToValueAtTime(1046.50, now + 0.3); // C6
-
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
-      
-      successGain2.gain.setValueAtTime(0, now);
-      successGain2.gain.linearRampToValueAtTime(0.1, now + 0.1);
-      successGain2.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
-
-      osc.start(now);
-      osc.stop(now + 1.0);
-      successOsc2.start(now);
-      successOsc2.stop(now + 1.2);
+      // "Crystal Chime": A chord of pure sine waves with long release
+      [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => { // C Major 7
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        
+        gain.connect(masterGain);
+        // Staggered entry for "strumming" effect
+        const start = now + (i * 0.05);
+        gain.gain.setValueAtTime(0, start);
+        gain.gain.linearRampToValueAtTime(0.05, start + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + 2.0); // Long tail
+        
+        osc.connect(gain);
+        osc.start(start);
+        osc.stop(start + 2.0);
+      });
       break;
 
     case 'error':
-      // Discordant 'Thud'
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(150, now);
-      osc.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+      // "Dull Thud": Low frequency triangle wave, heavily filtered (Book closing sound)
+      const errOsc = ctx.createOscillator();
+      const errGain = ctx.createGain();
+      const errFilter = ctx.createBiquadFilter();
       
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      errOsc.type = 'triangle';
+      errOsc.frequency.setValueAtTime(80, now);
+      errOsc.frequency.exponentialRampToValueAtTime(40, now + 0.2);
       
-      osc.start(now);
-      osc.stop(now + 0.4);
+      errFilter.type = 'lowpass';
+      errFilter.frequency.setValueAtTime(200, now);
+      
+      errGain.gain.setValueAtTime(0.5, now);
+      errGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+      
+      errOsc.connect(errFilter);
+      errFilter.connect(errGain);
+      errGain.connect(masterGain);
+      
+      errOsc.start(now);
+      errOsc.stop(now + 0.3);
       break;
 
     case 'click':
-      // Parchment/Ink Sound (High tick)
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(800, now);
-      osc.frequency.exponentialRampToValueAtTime(0.01, now + 0.1);
+      // "Quill Scratch" / "Gem Tap": Very high pitch, extremely short sine
+      const clickOsc = ctx.createOscillator();
+      const clickGain = ctx.createGain();
       
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+      clickOsc.type = 'sine';
+      clickOsc.frequency.setValueAtTime(1200, now);
       
-      osc.start(now);
-      osc.stop(now + 0.1);
-      break;
-
-    case 'hover':
-      // Very subtle magical shimmer
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(1200, now);
+      clickGain.gain.setValueAtTime(0, now);
+      clickGain.gain.linearRampToValueAtTime(0.05, now + 0.005);
+      clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
       
-      gain.gain.setValueAtTime(0.02, now);
-      gain.gain.linearRampToValueAtTime(0.001, now + 0.05);
+      clickOsc.connect(clickGain);
+      clickGain.connect(masterGain);
       
-      osc.start(now);
-      osc.stop(now + 0.05);
+      clickOsc.start(now);
+      clickOsc.stop(now + 0.05);
       break;
 
     case 'swipe':
-      // Card friction (Noise-like FM)
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(200, now);
-      osc.frequency.linearRampToValueAtTime(600, now + 0.2);
+      // "Parchment Slide": Bandpass filtered noise
+      const noiseSrc = ctx.createBufferSource();
+      noiseSrc.buffer = createNoiseBuffer(ctx);
+      const swipeFilter = ctx.createBiquadFilter();
+      const swipeGain = ctx.createGain();
       
-      gain.gain.setValueAtTime(0.05, now);
-      gain.gain.linearRampToValueAtTime(0.001, now + 0.2);
+      swipeFilter.type = 'bandpass';
+      swipeFilter.frequency.setValueAtTime(400, now);
+      swipeFilter.frequency.linearRampToValueAtTime(800, now + 0.2);
+      swipeFilter.Q.value = 1;
       
-      osc.start(now);
-      osc.stop(now + 0.2);
+      swipeGain.gain.setValueAtTime(0.05, now);
+      swipeGain.gain.linearRampToValueAtTime(0.1, now + 0.1);
+      swipeGain.gain.linearRampToValueAtTime(0.001, now + 0.3);
+      
+      noiseSrc.connect(swipeFilter);
+      swipeFilter.connect(swipeGain);
+      swipeGain.connect(masterGain);
+      
+      noiseSrc.start(now);
+      noiseSrc.stop(now + 0.3);
       break;
       
     case 'tick':
-      // Clock tick
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(1000, now);
-      gain.gain.setValueAtTime(0.03, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-      osc.start(now);
-      osc.stop(now + 0.05);
+      // "Clockwork / Woodblock": High sine with instant decay
+      const tickOsc = ctx.createOscillator();
+      const tickGain = ctx.createGain();
+      
+      tickOsc.type = 'sine';
+      tickOsc.frequency.setValueAtTime(800, now);
+      
+      tickGain.gain.setValueAtTime(0.1, now);
+      tickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+      
+      tickOsc.connect(tickGain);
+      tickGain.connect(masterGain);
+      
+      tickOsc.start(now);
+      tickOsc.stop(now + 0.05);
       break;
   }
 };

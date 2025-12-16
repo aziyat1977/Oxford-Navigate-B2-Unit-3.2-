@@ -159,7 +159,6 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
                           <button
                             key={i}
                             onClick={() => handleAnswer(i)}
-                            onMouseEnter={() => playSound('hover')}
                             className="relative p-6 bg-parchment dark:bg-black border-2 border-ink dark:border-gray-600 hover:border-magic-gold hover:shadow-[0_0_15px_#d4af37] active:scale-95 active:bg-ink/5 dark:active:bg-magic-gold/10 transition-all text-left group overflow-hidden shadow-md"
                           >
                               <span className="font-rune text-sm opacity-50 mr-4 group-hover:opacity-100 text-ink dark:text-parchment">

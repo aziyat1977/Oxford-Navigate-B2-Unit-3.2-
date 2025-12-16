@@ -88,7 +88,6 @@ const Menu: React.FC<MenuProps> = ({ currentView, setView, darkMode, toggleTheme
                      <button
                        key={item.id}
                        onClick={() => handleNav(item.id)}
-                       onMouseEnter={() => playSound('hover')}
                        className={`font-body text-2xl md:text-3xl transition-all hover:scale-105 active:scale-95 italic py-2
                          ${currentView === item.id 
                            ? 'text-crimson font-bold decoration-wavy underline' 
