@@ -25,7 +25,7 @@ const createNoiseBuffer = (ctx: AudioContext) => {
   return buffer;
 };
 
-export const playSound = (type: 'success' | 'error' | 'click' | 'swipe' | 'tick' | 'level_complete') => {
+export const playSound = (type: 'success' | 'error' | 'click' | 'swipe' | 'tick' | 'level_complete' | 'grab') => {
   const ctx = getContext();
   if (!ctx) return;
   
@@ -84,14 +84,14 @@ export const playSound = (type: 'success' | 'error' | 'click' | 'swipe' | 'tick'
       const errGain = ctx.createGain();
       const errFilter = ctx.createBiquadFilter();
       
-      errOsc.type = 'triangle';
-      errOsc.frequency.setValueAtTime(80, now);
-      errOsc.frequency.exponentialRampToValueAtTime(40, now + 0.2);
+      errOsc.type = 'triangle'; // Triangle is softer than sawtooth
+      errOsc.frequency.setValueAtTime(150, now); // Lower pitch
+      errOsc.frequency.exponentialRampToValueAtTime(50, now + 0.3); // Pitch drop
       
       errFilter.type = 'lowpass';
-      errFilter.frequency.setValueAtTime(200, now);
+      errFilter.frequency.setValueAtTime(300, now);
       
-      errGain.gain.setValueAtTime(0.5, now);
+      errGain.gain.setValueAtTime(0.2, now); // Lower volume
       errGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
       
       errOsc.connect(errFilter);
@@ -120,27 +120,60 @@ export const playSound = (type: 'success' | 'error' | 'click' | 'swipe' | 'tick'
       clickOsc.stop(now + 0.05);
       break;
 
+    case 'grab':
+      // Short high pitch blip for grabbing
+      const grabOsc = ctx.createOscillator();
+      const grabGain = ctx.createGain();
+      
+      grabOsc.type = 'sine';
+      grabOsc.frequency.setValueAtTime(800, now);
+      grabOsc.frequency.linearRampToValueAtTime(1200, now + 0.05);
+      
+      grabGain.gain.setValueAtTime(0, now);
+      grabGain.gain.linearRampToValueAtTime(0.1, now + 0.01);
+      grabGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+      
+      grabOsc.connect(grabGain);
+      grabGain.connect(masterGain);
+      
+      grabOsc.start(now);
+      grabOsc.stop(now + 0.1);
+      break;
+
     case 'swipe':
-      const noiseSrc = ctx.createBufferSource();
-      noiseSrc.buffer = createNoiseBuffer(ctx);
-      const swipeFilter = ctx.createBiquadFilter();
-      const swipeGain = ctx.createGain();
+      // "Magical Pop" - A quick sine sweep + noise burst
+      const popOsc = ctx.createOscillator();
+      const popGain = ctx.createGain();
       
-      swipeFilter.type = 'bandpass';
-      swipeFilter.frequency.setValueAtTime(400, now);
-      swipeFilter.frequency.linearRampToValueAtTime(800, now + 0.2);
-      swipeFilter.Q.value = 1;
+      popOsc.type = 'sine';
+      popOsc.frequency.setValueAtTime(400, now);
+      popOsc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
       
-      swipeGain.gain.setValueAtTime(0.05, now);
-      swipeGain.gain.linearRampToValueAtTime(0.1, now + 0.1);
-      swipeGain.gain.linearRampToValueAtTime(0.001, now + 0.3);
+      popGain.gain.setValueAtTime(0.2, now);
+      popGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
       
-      noiseSrc.connect(swipeFilter);
-      swipeFilter.connect(swipeGain);
-      swipeGain.connect(masterGain);
+      popOsc.connect(popGain);
+      popGain.connect(masterGain);
+      popOsc.start(now);
+      popOsc.stop(now + 0.15);
       
-      noiseSrc.start(now);
-      noiseSrc.stop(now + 0.3);
+      // Add a little snap texture
+      const snapSrc = ctx.createBufferSource();
+      snapSrc.buffer = createNoiseBuffer(ctx);
+      const snapFilter = ctx.createBiquadFilter();
+      const snapGain = ctx.createGain();
+      
+      snapFilter.type = 'highpass';
+      snapFilter.frequency.value = 1000;
+      
+      snapGain.gain.setValueAtTime(0.1, now);
+      snapGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+      
+      snapSrc.connect(snapFilter);
+      snapFilter.connect(snapGain);
+      snapGain.connect(masterGain);
+      snapSrc.start(now);
+      snapSrc.stop(now + 0.05);
       break;
       
     case 'tick':
