@@ -88,13 +88,95 @@ const TranslationControl = ({ ru, uz }: { ru: string, uz: string }) => {
     );
 };
 
-// --- SPEAKING DATA (Simplified for brevity, logic remains) ---
+// --- UNIQUE SPEAKING QUESTIONS ---
+const VOCAB_QUESTIONS: Record<string, string[]> = {
+  "choose the right": [
+    "When is it difficult to choose the right moment to speak?",
+    "How do you know when you've chosen the right path in life?",
+    "Describe a time you chose the right gift for someone."
+  ],
+  "fritter away": [
+    "What small things do you tend to fritter away your money on?",
+    "Do you ever fritter away time on social media when you should be working?",
+    "How can we stop frittering away our planet's natural resources?"
+  ],
+  "get your ...'s worth": [
+    "When was the last time you really felt you got your money's worth?",
+    "How do you ensure you get your money's worth on a vacation?",
+    "Do you think university education is always worth the money?"
+  ],
+  "get your money's worth": [
+      "When was the last time you really felt you got your money's worth?",
+      "How do you ensure you get your money's worth on a vacation?",
+      "Do you think university education is always worth the money?"
+  ],
+  "have ... to spare": [
+    "What would you do if you had an hour to spare right now?",
+    "Do you usually have money to spare for charity?",
+    "When you have time to spare, do you prefer to relax or be productive?"
+  ],
+  "invest": [
+    "If you could invest in one futuristic technology, what would it be?",
+    "Why is it important to invest time in building relationships?",
+    "What is the best way to invest in your own personal growth?"
+  ],
+  "kill": [
+    "What is your favorite app to kill time when waiting?",
+    "Is 'killing time' actually just wasting your life?",
+    "How do you kill time during a long, boring flight?"
+  ],
+  "run out of": [
+    "What is something you absolutely hate running out of?",
+    "Have you ever ran out of patience with a close friend?",
+    "What do you think happens when we run out of time?"
+  ],
+  "set aside": [
+    "Do you set aside money for emergencies? Why or why not?",
+    "How much time do you set aside for studying English each week?",
+    "Why is it sometimes hard to set aside your ego?"
+  ],
+  "throw your ... around": [
+    "Why do some wealthy people feel the need to throw their money around?",
+    "Have you ever seen someone throw their weight around to get what they want?",
+    "Is it attractive or annoying when people throw their money around?"
+  ],
+  "waste": [
+    "What do you consider the biggest waste of time in modern society?",
+    "Do you feel guilty when you waste food?",
+    "How can we reduce the amount of waste we produce daily?"
+  ],
+  "while away": [
+    "How do you usually while away a rainy Sunday afternoon?",
+    "What is the best game to while away the hours?",
+    "Do you prefer to while away time alone or with friends?"
+  ],
+  "are short of": [
+    "What do you do when you are short of cash at the end of the month?",
+    "Are you often short of time in the mornings?",
+    "Why are we sometimes short of patience with people we love?"
+  ],
+  "make": [
+    "How do you make time for exercise in a busy schedule?",
+    "Is it possible to make time for everything, or must we choose?",
+    "Why is it essential to make time for family?"
+  ]
+};
+
 const getQuestionsForWord = (phrase: string): string[] => {
-    return [
-        `How does "${phrase}" relate to your daily life?`,
-        `Can using "${phrase}" change your future plans?`,
-        `Describe a situation where you might "${phrase}".`
-    ];
+  // Normalize key to find match
+  const key = Object.keys(VOCAB_QUESTIONS).find(k => k.toLowerCase() === phrase.toLowerCase()) 
+            || Object.keys(VOCAB_QUESTIONS).find(k => phrase.toLowerCase().includes(k.toLowerCase().replace("...", "")));
+            
+  if (key && VOCAB_QUESTIONS[key]) {
+      return VOCAB_QUESTIONS[key];
+  }
+  
+  // Fallback if specific questions aren't found
+  return [
+    `How does "${phrase}" relate to your daily habits?`,
+    `Can using "${phrase}" correctly change your future success?`,
+    `Describe a vivid scenario where you might "${phrase}".`
+  ];
 };
 
 // --- SUB-COMPONENTS ---
