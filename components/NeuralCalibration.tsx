@@ -22,35 +22,43 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
   const [timeLeft, setTimeLeft] = useState(15); 
   const [feedbackState, setFeedbackState] = useState<'neutral' | 'correct' | 'incorrect'>('neutral');
   const [showResult, setShowResult] = useState(false);
+  const [isPaused, setIsPaused] = useState(false); // New state to pause timer during feedback
   
   const timerRef = useRef<any>(null);
 
   useEffect(() => {
-    if (showResult) return;
+    if (showResult || isPaused) return;
+    
     setTimeLeft(15); 
     
     timerRef.current = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
+          clearInterval(timerRef.current);
           handleTimeOut();
           return 0;
         }
+        if (prev <= 4) playSound('tick'); // Sound hint for low time
         return prev - 1;
       });
     }, 1000);
 
     return () => clearInterval(timerRef.current);
-  }, [index]);
+  }, [index, isPaused, showResult]);
 
   const handleTimeOut = () => {
+    if (isPaused) return; // Prevent double trigger
     playSound('error');
     setFeedbackState('incorrect');
     updateLife(-5);
     setStreak(0);
+    setIsPaused(true); // Pause logic
+    
     setTimeout(() => {
+       setIsPaused(false);
        setFeedbackState('neutral');
        nextQ();
-    }, 500);
+    }, 1000);
   };
 
   const nextQ = () => {
@@ -63,6 +71,11 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
   };
 
   const handleAnswer = (optionIndex: number) => {
+    if (isPaused) return; // Prevent multiple clicks
+    
+    clearInterval(timerRef.current); // Stop timer immediately
+    setIsPaused(true);
+
     const isCorrect = optionIndex === questions[index].a;
     if (isCorrect) {
         playSound('success');
@@ -79,9 +92,10 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
     }
     
     setTimeout(() => {
+        setIsPaused(false);
         setFeedbackState('neutral');
         nextQ();
-    }, 300);
+    }, 800); // Wait for animation
   };
 
   if (showResult) {
@@ -91,7 +105,7 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
             <p className="text-ink dark:text-parchment text-2xl mb-8 font-body italic">
                 MASTERY: {Math.round((score / questions.length) * 100)}%
             </p>
-            <button onClick={onComplete} className="px-10 py-4 bg-ink text-parchment text-xl font-bold rounded-sm border-2 border-magic-gold hover:bg-crimson transition-colors shadow-lg">
+            <button onClick={() => { playSound('click'); onComplete(); }} className="px-10 py-4 bg-ink text-parchment text-xl font-bold rounded-sm border-2 border-magic-gold hover:bg-crimson active:scale-95 transition-all shadow-lg">
                 OPEN THE GRIMOIRE
             </button>
         </div>
@@ -102,10 +116,10 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
     <div className={`h-full w-full bg-parchment dark:bg-obsidian flex flex-col items-center justify-center font-body relative overflow-hidden transition-colors duration-200 bg-paper-texture dark:bg-leather-texture`}>
       
       {/* Visual Feedback Overlay */}
-      {feedbackState === 'correct' && <div className="absolute inset-0 bg-emerald-rune/20 z-0" />}
-      {feedbackState === 'incorrect' && <div className="absolute inset-0 bg-crimson/20 z-0" />}
+      {feedbackState === 'correct' && <div className="absolute inset-0 bg-emerald-rune/20 z-0 animate-pulse" />}
+      {feedbackState === 'incorrect' && <div className="absolute inset-0 bg-crimson/20 z-0 animate-pulse" />}
 
-      <div className="z-10 w-full max-w-4xl px-8 py-10 border-[6px] border-double border-ink/40 dark:border-magic-gold/40 rounded-lg bg-parchment/90 dark:bg-obsidian/90 shadow-2xl">
+      <div className="z-10 w-full max-w-4xl px-8 py-10 border-[6px] border-double border-ink/40 dark:border-magic-gold/40 rounded-lg bg-parchment/90 dark:bg-obsidian/90 shadow-2xl mx-4">
           
           <div className="flex justify-between items-center mb-8 font-rune text-lg text-ink/70 dark:text-parchment/70">
               <div className="text-mystic-blue">Rune: {index + 1}/{questions.length}</div>
@@ -115,10 +129,10 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
           {/* Candle Timer */}
           <div className="w-full h-2 bg-ink/20 dark:bg-parchment/20 mb-12 relative rounded-full overflow-hidden">
              <motion.div 
-               key={index}
+               key={index} // Force re-render on new question
                initial={{ width: "100%" }}
-               animate={{ width: "0%" }}
-               transition={{ duration: 15, ease: "linear" }}
+               animate={{ width: isPaused ? `${(timeLeft/15)*100}%` : "0%" }} // Stop animation if paused
+               transition={{ duration: isPaused ? 0 : 15, ease: "linear" }}
                className={`h-full ${timeLeft < 5 ? 'bg-crimson shadow-[0_0_10px_red]' : 'bg-magic-gold shadow-[0_0_10px_gold]'}`}
              />
           </div>
@@ -135,7 +149,7 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
                       {questions[index].q.split("_____").map((part, i) => (
                           <React.Fragment key={i}>
                               {part}
-                              {i === 0 && <span className="inline-block w-40 border-b-4 border-dotted border-mystic-blue mx-2"></span>}
+                              {i === 0 && <span className="inline-block w-20 md:w-40 border-b-4 border-dotted border-mystic-blue mx-2"></span>}
                           </React.Fragment>
                       ))}
                   </h2>
@@ -146,7 +160,7 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
                             key={i}
                             onClick={() => handleAnswer(i)}
                             onMouseEnter={() => playSound('hover')}
-                            className="relative p-6 bg-parchment dark:bg-black border-2 border-ink dark:border-gray-600 hover:border-magic-gold hover:shadow-[0_0_15px_#d4af37] transition-all text-left group overflow-hidden shadow-md"
+                            className="relative p-6 bg-parchment dark:bg-black border-2 border-ink dark:border-gray-600 hover:border-magic-gold hover:shadow-[0_0_15px_#d4af37] active:scale-95 active:bg-ink/5 dark:active:bg-magic-gold/10 transition-all text-left group overflow-hidden shadow-md"
                           >
                               <span className="font-rune text-sm opacity-50 mr-4 group-hover:opacity-100 text-ink dark:text-parchment">
                                 {['I', 'II', 'III', 'IV'][i]}

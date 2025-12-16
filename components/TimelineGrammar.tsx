@@ -38,7 +38,7 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
           <motion.div 
             key="intro"
             initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, x: -100 }}
-            className="max-w-xl p-10 border-4 border-double border-ink dark:border-magic-gold bg-parchment shadow-2xl rounded-sm relative"
+            className="max-w-xl p-10 border-4 border-double border-ink dark:border-magic-gold bg-parchment shadow-2xl rounded-sm relative mx-4"
           >
             {/* Wax Seal Decoration */}
             <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-crimson rounded-full border-4 border-white/20 shadow-md"></div>
@@ -50,7 +50,7 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
             </p>
             <button 
               onClick={() => { playSound('click'); setStage('scene1'); }}
-              className="w-full px-6 py-3 bg-ink text-parchment font-bold hover:bg-crimson transition-colors font-display text-lg rounded-sm"
+              className="w-full px-6 py-3 bg-ink text-parchment font-bold hover:bg-crimson active:scale-95 transition-all font-display text-lg rounded-sm"
             >
               Unfurl the First Scroll
             </button>
@@ -72,7 +72,7 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
                  "Do not disturb the wizard at sunset. He <span className="text-mystic-blue font-bold border-b-2 border-mystic-blue">will be casting</span> the spell."
                </p>
 
-               <button onClick={() => { playSound('click'); setStage('check1'); }} className="px-8 py-3 border-2 border-ink dark:border-parchment hover:bg-ink hover:text-parchment transition-all font-display text-lg">
+               <button onClick={() => { playSound('click'); setStage('check1'); }} className="px-8 py-3 border-2 border-ink dark:border-parchment hover:bg-ink hover:text-parchment active:scale-95 transition-all font-display text-lg">
                  Interpret the Vision
                </button>
            </motion.div>
@@ -83,7 +83,7 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
           <motion.div 
             key="c1" 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0, x: error ? [0, -10, 10, 0] : 0 }} 
-            className="max-w-md w-full p-8 bg-parchment border-4 border-ink shadow-2xl relative"
+            className="max-w-md w-full p-8 bg-parchment border-4 border-ink shadow-2xl relative mx-4"
           >
              <h3 className="text-mystic-blue font-display text-lg mb-4 text-center">The Riddle of the Flow</h3>
              <p className="mb-8 text-xl text-center italic">At sunset, is the spell finished?</p>
@@ -91,13 +91,13 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
              <div className="grid grid-cols-2 gap-4">
                <button 
                  onClick={() => verify(false, '')}
-                 className="p-4 border-2 border-ink hover:bg-crimson hover:text-white transition-colors font-bold"
+                 className="p-4 border-2 border-ink hover:bg-crimson hover:text-white active:scale-95 transition-all font-bold"
                >
                  YES <br/>(It is done)
                </button>
                <button 
                  onClick={() => verify(true, 'scene2')}
-                 className="p-4 border-2 border-ink hover:bg-mystic-blue hover:text-white transition-colors font-bold"
+                 className="p-4 border-2 border-ink hover:bg-mystic-blue hover:text-white active:scale-95 transition-all font-bold"
                >
                  NO <br/>(It is happening)
                </button>
@@ -122,7 +122,7 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
                  "By the next moon, I <span className="text-crimson font-bold border-b-2 border-crimson">will have slain</span> the dragon."
                </p>
 
-               <button onClick={() => { playSound('click'); setStage('check2'); }} className="px-8 py-3 border-2 border-ink dark:border-parchment hover:bg-ink hover:text-parchment transition-all font-display text-lg">
+               <button onClick={() => { playSound('click'); setStage('check2'); }} className="px-8 py-3 border-2 border-ink dark:border-parchment hover:bg-ink hover:text-parchment active:scale-95 transition-all font-display text-lg">
                  Interpret the Vow
                </button>
            </motion.div>
@@ -133,7 +133,7 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
           <motion.div 
             key="c2" 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0, x: error ? [0, -10, 10, 0] : 0 }} 
-            className="max-w-md w-full p-8 bg-parchment border-4 border-ink shadow-2xl relative"
+            className="max-w-md w-full p-8 bg-parchment border-4 border-ink shadow-2xl relative mx-4"
           >
              <h3 className="text-crimson font-display text-lg mb-4 text-center">The Riddle of the Mark</h3>
              <p className="mb-8 text-xl text-center italic">Does "By the next moon" mean before or at that moment?</p>
@@ -141,13 +141,13 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
              <div className="grid grid-cols-2 gap-4">
                <button 
                  onClick={() => verify(true, 'finish')}
-                 className="p-4 border-2 border-ink hover:bg-crimson hover:text-white transition-colors font-bold"
+                 className="p-4 border-2 border-ink hover:bg-crimson hover:text-white active:scale-95 transition-all font-bold"
                >
                  BEFORE <br/>(Completed)
                </button>
                <button 
                  onClick={() => verify(false, '')}
-                 className="p-4 border-2 border-ink hover:bg-mystic-blue hover:text-white transition-colors font-bold"
+                 className="p-4 border-2 border-ink hover:bg-mystic-blue hover:text-white active:scale-95 transition-all font-bold"
                >
                  EXACTLY AT <br/>(Starting)
                </button>
@@ -158,15 +158,15 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
 
         {/* 6. FINISH */}
         {stage === 'finish' && (
-           <motion.div key="fin" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center p-12 border-4 border-double border-magic-gold rounded-lg bg-obsidian text-parchment shadow-2xl max-w-lg">
+           <motion.div key="fin" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center p-12 border-4 border-double border-magic-gold rounded-lg bg-obsidian text-parchment shadow-2xl max-w-lg mx-4">
                <h2 className="text-3xl font-display font-bold mb-6 text-magic-gold">Knowledge Inscribed</h2>
                <div className="text-left space-y-6 mb-10 text-lg font-body">
                    <p><span className="text-mystic-blue font-bold text-xl">Future Continuous:</span><br/> The spell is casting. (will be -ing)</p>
                    <p><span className="text-crimson font-bold text-xl">Future Perfect:</span><br/> The quest is complete. (will have -ed)</p>
                </div>
                <button 
-                onClick={onComplete}
-                className="w-full py-4 bg-magic-gold text-ink font-display font-bold hover:scale-105 transition-transform shadow-[0_0_20px_#d4af37]"
+                onClick={() => { playSound('click'); onComplete(); }}
+                className="w-full py-4 bg-magic-gold text-ink font-display font-bold hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_#d4af37]"
                >
                    ENTER THE TRIAL OF WITS
                </button>

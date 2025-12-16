@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { playSound } from '../utils/audio';
+import { playSound, initAudio } from '../utils/audio';
 
 interface MenuProps {
   currentView: string;
@@ -22,6 +22,7 @@ const Menu: React.FC<MenuProps> = ({ currentView, setView, darkMode, toggleTheme
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
+    initAudio();
     playSound('click');
     setIsOpen(!isOpen);
   };
@@ -40,15 +41,17 @@ const Menu: React.FC<MenuProps> = ({ currentView, setView, darkMode, toggleTheme
         {/* The Wax Seal (Menu Button) */}
         <button 
           onClick={toggleMenu}
-          className="pointer-events-auto bg-crimson border-4 border-double border-magic-gold text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform group"
+          className="pointer-events-auto bg-crimson border-4 border-double border-magic-gold text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-90 transition-transform group touch-manipulation"
+          aria-label="Toggle Menu"
         >
            <span className="font-display font-bold text-xl">{isOpen ? 'X' : 'M'}</span>
         </button>
 
         {/* Theme Toggle (Sun/Moon Amulet) */}
         <button 
-          onClick={() => { playSound('click'); toggleTheme(); }}
-          className="pointer-events-auto bg-ink dark:bg-parchment text-parchment dark:text-ink w-12 h-12 rounded-full border-2 border-magic-gold flex items-center justify-center shadow-[0_0_15px_#d4af37]"
+          onClick={() => { initAudio(); playSound('click'); toggleTheme(); }}
+          className="pointer-events-auto bg-ink dark:bg-parchment text-parchment dark:text-ink w-12 h-12 rounded-full border-2 border-magic-gold flex items-center justify-center shadow-[0_0_15px_#d4af37] hover:scale-110 active:scale-90 transition-transform touch-manipulation"
+          aria-label="Toggle Theme"
         >
           {darkMode ? '☀' : '☾'}
         </button>
@@ -63,9 +66,13 @@ const Menu: React.FC<MenuProps> = ({ currentView, setView, darkMode, toggleTheme
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.3 }}
             className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsOpen(false)} // Close on background click
           >
              {/* The Book Page */}
-             <div className="bg-parchment dark:bg-obsidian w-full max-w-lg h-[80vh] rounded-lg shadow-[0_0_50px_rgba(0,0,0,0.8)] border-8 border-double border-ink dark:border-magic-gold relative overflow-hidden flex flex-col p-8 md:p-12 text-center bg-paper-texture dark:bg-leather-texture">
+             <div 
+               className="bg-parchment dark:bg-obsidian w-full max-w-lg h-[80vh] rounded-lg shadow-[0_0_50px_rgba(0,0,0,0.8)] border-8 border-double border-ink dark:border-magic-gold relative overflow-hidden flex flex-col p-8 md:p-12 text-center bg-paper-texture dark:bg-leather-texture"
+               onClick={(e) => e.stopPropagation()} // Prevent close on book click
+             >
                 
                 <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-magic-gold" />
                 <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-magic-gold" />
@@ -82,7 +89,7 @@ const Menu: React.FC<MenuProps> = ({ currentView, setView, darkMode, toggleTheme
                        key={item.id}
                        onClick={() => handleNav(item.id)}
                        onMouseEnter={() => playSound('hover')}
-                       className={`font-body text-2xl md:text-3xl transition-all hover:scale-105 italic
+                       className={`font-body text-2xl md:text-3xl transition-all hover:scale-105 active:scale-95 italic py-2
                          ${currentView === item.id 
                            ? 'text-crimson font-bold decoration-wavy underline' 
                            : 'text-ink dark:text-parchment hover:text-mystic-blue'
