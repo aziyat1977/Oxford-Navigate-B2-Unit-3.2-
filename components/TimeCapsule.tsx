@@ -18,7 +18,7 @@ const TimeCapsule = () => {
     setLoading(false);
     setFeedback(result);
     
-    // Simple check to "Lock" if feedback is positive (simulated logic)
+    // Simple check to "Lock" if feedback is positive
     if (result.toLowerCase().includes("billionaire") || result.toLowerCase().includes("upgrade complete")) {
       setLocked(true);
     }
@@ -33,20 +33,21 @@ const TimeCapsule = () => {
         {/* Header */}
         <div className="text-center">
           <h1 className="text-4xl md:text-5xl font-display font-black text-white mb-2 tracking-tighter">
-            MANIFESTO <span className="text-neon-pink">2035</span>
+            LIFE IN <span className="text-neon-pink">2040</span>
           </h1>
           <p className="text-slate-400 font-mono text-sm max-w-xl mx-auto">
-            Write a letter to your future self. It will be sealed in the capsule.
+            Describe your future. Draw it in your mind, then write it down.
           </p>
         </div>
 
         {/* Requirements Box */}
         <div className="bg-slate-900/80 border border-slate-700 p-4 rounded text-xs font-mono text-neon-green">
-            <h3 className="font-bold mb-2 text-white">SYSTEM REQUIREMENTS (B2 PROTOCOL):</h3>
+            <h3 className="font-bold mb-2 text-white">MISSION PARAMETERS:</h3>
             <ul className="list-disc pl-4 space-y-1">
-                <li>Prediction: Use <span className="text-white">Future Continuous</span> (e.g., 'I will be managing...')</li>
-                <li>Milestone: Use <span className="text-white">Future Perfect</span> (e.g., 'I will have saved...')</li>
-                <li>Vocab: Use 2 keywords (Invest, Fritter away, Kill time, While away).</li>
+                <li>Sentence 1: <span className="text-white">In 2040, I will be working...</span> (Future Continuous)</li>
+                <li>Sentence 2: <span className="text-white">I will be living...</span> (Future Continuous)</li>
+                <li>Sentence 3: <span className="text-white">By 2040, I will have bought...</span> (Future Perfect)</li>
+                <li>Vocab: Use <span className="text-white">"Invest time"</span> or <span className="text-white">"Fritter away"</span>.</li>
             </ul>
         </div>
 
@@ -63,7 +64,7 @@ const TimeCapsule = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             disabled={loading || locked}
-            placeholder="Dear Future Me. By 2035, I hope you haven't frittered away..."
+            placeholder="In 2040, I will be working as a cyber-security expert..."
             className="w-full h-48 bg-black text-neon-green p-6 font-mono text-lg focus:outline-none resize-none"
           />
           
@@ -114,7 +115,7 @@ const TimeCapsule = () => {
                     <span className="text-4xl">🔒</span>
                 </div>
                 <h3 className="text-neon-green font-display text-xl">TIME CAPSULE LOCKED.</h3>
-                <p className="text-xs text-slate-500 font-mono mt-2">OPENING DATE: OCT 26, 2035</p>
+                <p className="text-xs text-slate-500 font-mono mt-2">OPENING DATE: OCT 26, 2040</p>
             </motion.div>
         )}
 

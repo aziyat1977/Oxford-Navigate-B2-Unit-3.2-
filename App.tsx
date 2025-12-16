@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Landing from './components/Landing';
 import AssetSorter from './components/AssetSorter';
 import TimelineGrammar from './components/TimelineGrammar';
-import PangeaSim from './components/PangeaSim';
+import NeuralCalibration from './components/NeuralCalibration';
 import TimeCapsule from './components/TimeCapsule';
 
 const App = () => {
@@ -34,7 +34,7 @@ const App = () => {
         
         {level === 3 && (
           <motion.div key="lvl3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0">
-             <PangeaSim onComplete={nextLevel} />
+             <NeuralCalibration onComplete={nextLevel} />
           </motion.div>
         )}
         
@@ -48,7 +48,7 @@ const App = () => {
       {/* Persistent HUD */}
       {level > 0 && (
         <div className="fixed top-6 right-6 z-50 flex flex-col items-end pointer-events-none mix-blend-exclusion">
-          <div className="text-[10px] font-mono text-gray-400">TEMPORA OS v2.4</div>
+          <div className="text-[10px] font-mono text-gray-400">TEMPORA OS v3.0</div>
           <div className="text-xl font-display font-bold tracking-tighter">LEVEL 0{level} / 04</div>
         </div>
       )}
