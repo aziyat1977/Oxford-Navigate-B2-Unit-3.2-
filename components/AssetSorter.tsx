@@ -100,21 +100,50 @@ const getQuestionsForWord = (phrase: string): string[] => {
 // --- SUB-COMPONENTS ---
 
 const SpeakingOverlay = ({ word, questions, idx, onNext }: { word: string, questions: string[], idx: number, onNext: () => void }) => {
+    const [timeLeft, setTimeLeft] = useState(60);
+
+    useEffect(() => {
+        setTimeLeft(60);
+        const timer = setInterval(() => {
+            setTimeLeft(prev => {
+                if (prev <= 1) {
+                    clearInterval(timer);
+                    playSound('error'); // Timeout sound
+                    onNext();
+                    return 0;
+                }
+                if (prev <= 11) playSound('tick'); // Tick for last 10 seconds
+                return prev - 1;
+            });
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [idx, onNext]);
+
     return (
         <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="absolute inset-0 z-50 bg-obsidian/95 flex flex-col items-center justify-center p-6 text-center backdrop-blur-xl"
         >
-            <div className="text-magic-gold font-rune text-xl mb-8 tracking-widest uppercase">
-                Oracle Interrogation {idx + 1} / {questions.length}
+            <div className="w-full max-w-4xl flex justify-between items-center mb-12 px-4 border-b border-parchment/20 pb-4">
+                <div className="text-magic-gold font-rune text-xl tracking-widest uppercase">
+                    Oracle Interrogation {idx + 1} / {questions.length}
+                </div>
+                <div className={`text-4xl font-mono font-bold tabular-nums ${timeLeft <= 10 ? 'text-crimson animate-pulse' : 'text-parchment'}`}>
+                    00:{timeLeft.toString().padStart(2, '0')}
+                </div>
             </div>
-            <motion.h3 className="text-parchment text-3xl md:text-5xl font-display font-bold mb-8 leading-snug max-w-4xl">
+
+            <motion.h3 
+                key={questions[idx]}
+                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                className="text-parchment text-3xl md:text-5xl font-display font-bold mb-8 leading-snug max-w-4xl"
+            >
                 "{questions[idx]}"
             </motion.h3>
             <div className="text-parchment/60 italic mb-12 font-body text-xl">
                 Speak aloud. Use the phrase <span className="text-magic-gold font-bold border-b border-magic-gold">"{word}"</span>.
             </div>
-            <button onClick={() => { playSound('click'); onNext(); }} className="px-10 py-4 bg-crimson text-parchment font-bold text-xl font-display rounded shadow-[0_0_20px_rgba(220,20,60,0.4)]">
+            <button onClick={() => { playSound('click'); onNext(); }} className="px-10 py-4 bg-crimson text-parchment font-bold text-xl font-display rounded shadow-[0_0_20px_rgba(220,20,60,0.4)] hover:scale-105 transition-transform border-2 border-transparent hover:border-parchment">
                 CONFIRM TRANSMISSION
             </button>
         </motion.div>
