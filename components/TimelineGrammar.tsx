@@ -24,54 +24,57 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
   };
 
   return (
-    <div className="h-full w-full bg-gray-50 dark:bg-black relative font-mono text-slate-900 dark:text-white overflow-hidden flex items-center justify-center transition-colors">
+    <div className="h-full w-full bg-parchment dark:bg-obsidian relative font-body text-ink dark:text-parchment overflow-hidden flex items-center justify-center transition-colors">
       
       {/* Background */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-gray-100 to-gray-200 dark:from-slate-900 dark:via-black dark:to-black opacity-80" />
-      <div className="absolute top-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500 dark:via-neon-cyan to-transparent opacity-50" />
-      <div className="absolute bottom-0 w-full h-px bg-gradient-to-r from-transparent via-red-500 dark:via-neon-pink to-transparent opacity-50" />
+      <div className="absolute inset-0 bg-paper-texture dark:bg-leather-texture opacity-50" />
+      <div className="absolute top-0 w-full h-2 bg-gradient-to-r from-transparent via-magic-gold to-transparent opacity-50" />
+      <div className="absolute bottom-0 w-full h-2 bg-gradient-to-r from-transparent via-crimson to-transparent opacity-50" />
 
       <AnimatePresence mode="wait">
         
-        {/* 1. INTRO */}
+        {/* 1. INTRO: The Library */}
         {stage === 'intro' && (
           <motion.div 
             key="intro"
             initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, x: -100 }}
-            className="max-w-xl p-8 border-l-2 border-emerald-500 dark:border-neon-green bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm shadow-xl"
+            className="max-w-xl p-10 border-4 border-double border-ink dark:border-magic-gold bg-parchment shadow-2xl rounded-sm relative"
           >
-            <h1 className="text-4xl font-display font-bold mb-4">TIMELINE DECRYPTION</h1>
-            <p className="text-slate-600 dark:text-slate-400 mb-6">
-              To proceed, you must analyze future temporal data. <br/>
-              <span className="text-emerald-600 dark:text-neon-green font-bold">Identify the patterns correctly to unlock the firewall.</span>
+            {/* Wax Seal Decoration */}
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-crimson rounded-full border-4 border-white/20 shadow-md"></div>
+
+            <h1 className="text-4xl font-display font-bold mb-4 text-center mt-4">The Prophecy Scrolls</h1>
+            <p className="text-xl italic mb-8 text-center">
+              To weave time, you must understand the difference between <br/>
+              <span className="text-mystic-blue font-bold">The Flow</span> and <span className="text-crimson font-bold">The Mark</span>.
             </p>
             <button 
               onClick={() => { playSound('click'); setStage('scene1'); }}
-              className="px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-black font-bold hover:bg-emerald-600 dark:hover:bg-neon-green transition-colors"
+              className="w-full px-6 py-3 bg-ink text-parchment font-bold hover:bg-crimson transition-colors font-display text-lg rounded-sm"
             >
-              START DECRYPTION
+              Unfurl the First Scroll
             </button>
           </motion.div>
         )}
 
-        {/* 2. SCENE 1 */}
+        {/* 2. SCENE 1: Future Continuous (Scrying) */}
         {stage === 'scene1' && (
-           <motion.div key="s1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center">
-               <div className="mb-6 relative w-64 h-40 mx-auto border-2 border-cyan-500 dark:border-neon-cyan bg-white dark:bg-black flex items-center justify-center overflow-hidden shadow-lg">
-                   <div className="absolute inset-0 bg-cyan-100 dark:bg-neon-cyan/10 animate-pulse" />
-                   <span className="text-4xl">🤖 ⌨️</span>
-                   <div className="absolute bottom-2 right-2 text-[10px] text-cyan-600 dark:text-neon-cyan">LIVE FEED: 2030</div>
+           <motion.div key="s1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center max-w-2xl px-4">
+               
+               {/* Scrying Mirror Visual */}
+               <div className="mb-8 relative w-48 h-64 mx-auto border-8 border-silver rounded-full bg-deep-purple flex items-center justify-center overflow-hidden shadow-[0_0_40px_rgba(75,0,130,0.6)]">
+                   <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] animate-spin-slow opacity-50" />
+                   <span className="text-5xl relative z-10">🔮</span>
+                   <div className="absolute bottom-4 text-xs font-rune text-white">Vision: Sunset</div>
                </div>
                
-               <p className="text-xl mb-8 font-bold">
-                 "Don't call me at 8 PM. I <span className="bg-cyan-100 dark:bg-neon-cyan/20 text-cyan-700 dark:text-neon-cyan px-2 rounded">will be coding</span> the mainframe."
+               <p className="text-2xl mb-8 font-body leading-relaxed">
+                 "Do not disturb the wizard at sunset. He <span className="text-mystic-blue font-bold border-b-2 border-mystic-blue">will be casting</span> the spell."
                </p>
 
-               <div className="flex gap-4 justify-center">
-                  <button onClick={() => { playSound('click'); setStage('check1'); }} className="px-6 py-2 border border-slate-400 dark:border-slate-700 hover:border-black dark:hover:border-white transition-all">
-                    ANALYZE GRAMMAR
-                  </button>
-               </div>
+               <button onClick={() => { playSound('click'); setStage('check1'); }} className="px-8 py-3 border-2 border-ink dark:border-parchment hover:bg-ink hover:text-parchment transition-all font-display text-lg">
+                 Interpret the Vision
+               </button>
            </motion.div>
         )}
 
@@ -80,47 +83,48 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
           <motion.div 
             key="c1" 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0, x: error ? [0, -10, 10, 0] : 0 }} 
-            className="max-w-md w-full p-6 border border-slate-200 dark:border-slate-800 bg-white dark:bg-black shadow-2xl"
+            className="max-w-md w-full p-8 bg-parchment border-4 border-ink shadow-2xl relative"
           >
-             <h3 className="text-cyan-600 dark:text-neon-cyan text-sm tracking-widest mb-4">DECRYPTION CHALLENGE 01</h3>
-             <p className="mb-6 text-lg">At 8 PM, is the action finished?</p>
+             <h3 className="text-mystic-blue font-display text-lg mb-4 text-center">The Riddle of the Flow</h3>
+             <p className="mb-8 text-xl text-center italic">At sunset, is the spell finished?</p>
              
              <div className="grid grid-cols-2 gap-4">
                <button 
                  onClick={() => verify(false, '')}
-                 className="p-4 border border-slate-300 dark:border-slate-700 hover:bg-red-100 dark:hover:bg-red-500/20 hover:border-red-500 transition-all text-slate-500 dark:text-slate-400 hover:text-red-700 dark:hover:text-white"
+                 className="p-4 border-2 border-ink hover:bg-crimson hover:text-white transition-colors font-bold"
                >
-                 YES (Finished)
+                 YES <br/>(It is done)
                </button>
                <button 
                  onClick={() => verify(true, 'scene2')}
-                 className="p-4 border border-slate-300 dark:border-slate-700 hover:bg-cyan-100 dark:hover:bg-neon-cyan/20 hover:border-cyan-500 dark:hover:border-neon-cyan transition-all text-slate-900 dark:text-white"
+                 className="p-4 border-2 border-ink hover:bg-mystic-blue hover:text-white transition-colors font-bold"
                >
-                 NO (In Progress)
+                 NO <br/>(It is happening)
                </button>
              </div>
-             {error && <div className="mt-4 text-red-500 text-xs text-center font-bold">ACCESS DENIED. TRY AGAIN.</div>}
+             {error && <div className="mt-4 text-crimson text-center font-bold">"Your inner eye is clouded. Look again."</div>}
           </motion.div>
         )}
 
-        {/* 4. SCENE 2 */}
+        {/* 4. SCENE 2: Future Perfect (Completed Quest) */}
         {stage === 'scene2' && (
-           <motion.div key="s2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center">
-               <div className="mb-6 relative w-64 h-40 mx-auto border-2 border-red-500 dark:border-neon-pink bg-white dark:bg-black flex items-center justify-center overflow-hidden shadow-lg">
-                   <div className="absolute inset-0 bg-red-100 dark:bg-neon-pink/5" />
-                   <span className="text-4xl">✅ 🏆</span>
-                   <div className="absolute bottom-2 right-2 text-[10px] text-red-600 dark:text-neon-pink">STATUS: COMPLETE</div>
+           <motion.div key="s2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center max-w-2xl px-4">
+               
+               {/* Quest Board Visual */}
+               <div className="mb-8 relative w-64 h-48 mx-auto bg-[#3e2723] border-4 border-[#5d4037] rounded shadow-lg flex items-center justify-center p-4">
+                   <div className="bg-parchment w-full h-full flex flex-col items-center justify-center shadow-inner">
+                        <span className="text-5xl mb-2">📜</span>
+                        <span className="text-crimson font-display font-bold text-2xl rotate-[-10deg] border-4 border-crimson px-2 rounded">DONE</span>
+                   </div>
                </div>
                
-               <p className="text-xl mb-8 font-bold">
-                 "By 2035, I <span className="bg-red-100 dark:bg-neon-pink/20 text-red-600 dark:text-neon-pink px-2 rounded">will have finished</span> the project."
+               <p className="text-2xl mb-8 font-body leading-relaxed">
+                 "By the next moon, I <span className="text-crimson font-bold border-b-2 border-crimson">will have slain</span> the dragon."
                </p>
 
-               <div className="flex gap-4 justify-center">
-                  <button onClick={() => { playSound('click'); setStage('check2'); }} className="px-6 py-2 border border-slate-400 dark:border-slate-700 hover:border-black dark:hover:border-white transition-all">
-                    ANALYZE GRAMMAR
-                  </button>
-               </div>
+               <button onClick={() => { playSound('click'); setStage('check2'); }} className="px-8 py-3 border-2 border-ink dark:border-parchment hover:bg-ink hover:text-parchment transition-all font-display text-lg">
+                 Interpret the Vow
+               </button>
            </motion.div>
         )}
 
@@ -129,42 +133,42 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
           <motion.div 
             key="c2" 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0, x: error ? [0, -10, 10, 0] : 0 }} 
-            className="max-w-md w-full p-6 border border-slate-200 dark:border-slate-800 bg-white dark:bg-black shadow-2xl"
+            className="max-w-md w-full p-8 bg-parchment border-4 border-ink shadow-2xl relative"
           >
-             <h3 className="text-red-600 dark:text-neon-pink text-sm tracking-widest mb-4">DECRYPTION CHALLENGE 02</h3>
-             <p className="mb-6 text-lg">Does "By 2035" mean before or exactly at that time?</p>
+             <h3 className="text-crimson font-display text-lg mb-4 text-center">The Riddle of the Mark</h3>
+             <p className="mb-8 text-xl text-center italic">Does "By the next moon" mean before or at that moment?</p>
              
              <div className="grid grid-cols-2 gap-4">
                <button 
                  onClick={() => verify(true, 'finish')}
-                 className="p-4 border border-slate-300 dark:border-slate-700 hover:bg-red-100 dark:hover:bg-neon-pink/20 hover:border-red-500 dark:hover:border-neon-pink transition-all text-slate-900 dark:text-white"
+                 className="p-4 border-2 border-ink hover:bg-crimson hover:text-white transition-colors font-bold"
                >
-                 BEFORE (Completed)
+                 BEFORE <br/>(Completed)
                </button>
                <button 
                  onClick={() => verify(false, '')}
-                 className="p-4 border border-slate-300 dark:border-slate-700 hover:bg-red-100 dark:hover:bg-red-500/20 hover:border-red-500 transition-all text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-white"
+                 className="p-4 border-2 border-ink hover:bg-mystic-blue hover:text-white transition-colors font-bold"
                >
-                 EXACTLY AT (Starting)
+                 EXACTLY AT <br/>(Starting)
                </button>
              </div>
-             {error && <div className="mt-4 text-red-500 text-xs text-center font-bold">ACCESS DENIED. THINK ABOUT 'DEADLINES'.</div>}
+             {error && <div className="mt-4 text-crimson text-center font-bold">"Look to the deadline, apprentice."</div>}
           </motion.div>
         )}
 
         {/* 6. FINISH */}
         {stage === 'finish' && (
-           <motion.div key="fin" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center p-8 border-2 border-emerald-500 dark:border-neon-green rounded bg-white dark:bg-slate-900/80 shadow-2xl">
-               <h2 className="text-2xl font-bold mb-4">DATA DOWNLOADED</h2>
-               <div className="text-left space-y-4 mb-8 text-sm text-slate-600 dark:text-slate-300 font-mono">
-                   <p><span className="text-cyan-600 dark:text-neon-cyan font-bold">Future Continuous:</span> Action in progress. (will be -ing)</p>
-                   <p><span className="text-red-600 dark:text-neon-pink font-bold">Future Perfect:</span> Action completed. (will have -ed)</p>
+           <motion.div key="fin" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center p-12 border-4 border-double border-magic-gold rounded-lg bg-obsidian text-parchment shadow-2xl max-w-lg">
+               <h2 className="text-3xl font-display font-bold mb-6 text-magic-gold">Knowledge Inscribed</h2>
+               <div className="text-left space-y-6 mb-10 text-lg font-body">
+                   <p><span className="text-mystic-blue font-bold text-xl">Future Continuous:</span><br/> The spell is casting. (will be -ing)</p>
+                   <p><span className="text-crimson font-bold text-xl">Future Perfect:</span><br/> The quest is complete. (will have -ed)</p>
                </div>
                <button 
                 onClick={onComplete}
-                className="w-full py-4 bg-emerald-500 dark:bg-neon-green text-white dark:text-black font-black hover:scale-105 transition-all shadow-lg"
+                className="w-full py-4 bg-magic-gold text-ink font-display font-bold hover:scale-105 transition-transform shadow-[0_0_20px_#d4af37]"
                >
-                   INITIATE NEURAL LINK
+                   ENTER THE TRIAL OF WITS
                </button>
            </motion.div>
         )}

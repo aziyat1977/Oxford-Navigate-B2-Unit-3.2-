@@ -8,18 +8,11 @@ interface NeuralProps {
 }
 
 const questions = [
-  { q: "This time next week, I _____ on a beach.", options: ["will lie", "will have lain", "will be lying", "am lying"], a: 2 },
-  { q: "By 2030, scientists _____ a cure.", options: ["will be finding", "will have found", "find", "are finding"], a: 1 },
-  { q: "Don't phone at 7. We _____ dinner.", options: ["will have had", "have", "will be having", "had"], a: 2 },
-  { q: "By the time you get home, the kids _____.", options: ["will have gone", "will be going", "go", "are going"], a: 0 },
-  { q: "At 10 o'clock tomorrow, she _____.", options: ["will have worked", "will be working", "worked", "works"], a: 1 },
-  { q: "I _____ all my exams by June 15th.", options: ["will be finishing", "will have finished", "finish", "am finishing"], a: 1 },
-  { q: "In fifty years, people _____ on Mars.", options: ["will be living", "will have lived", "live", "lived"], a: 0 },
-  { q: "By the end of this lesson, you _____ 5 words.", options: ["will be learning", "will have learned", "learn", "are learning"], a: 1 },
-  { q: "Will you _____ using the PC for long?", options: ["be", "have", "do", "are"], a: 0 },
-  { q: "By next year, he _____ saved enough.", options: ["will be", "will have", "is", "was"], a: 1 },
-  { q: "Tomorrow afternoon we _____ tennis.", options: ["will be playing", "will have played", "play", "played"], a: 0 },
-  { q: "By the time police arrive, the thief _____.", options: ["will be escaping", "will have escaped", "escapes", "is escaping"], a: 1 },
+  { q: "This time next week, I _____ on a dragon's back.", options: ["will fly", "will have flown", "will be flying", "am flying"], a: 2 },
+  { q: "By 2050, wizards _____ a cure for the plague.", options: ["will be finding", "will have found", "find", "are finding"], a: 1 },
+  { q: "Do not disturb. We _____ the feast.", options: ["will have had", "have", "will be having", "had"], a: 2 },
+  { q: "By the time you arrive, the goblins _____.", options: ["will have gone", "will be going", "go", "are going"], a: 0 },
+  { q: "At midnight, the witch _____ her brew.", options: ["will have stirred", "will be stirring", "stirred", "stirs"], a: 1 },
 ];
 
 const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) => {
@@ -32,7 +25,6 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
   
   const timerRef = useRef<any>(null);
 
-  // Timer Logic
   useEffect(() => {
     if (showResult) return;
     setTimeLeft(15); 
@@ -86,7 +78,6 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
         updateLife(-5);
     }
     
-    // Slight delay to show color
     setTimeout(() => {
         setFeedbackState('neutral');
         nextQ();
@@ -95,81 +86,78 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
 
   if (showResult) {
       return (
-        <div className="h-full w-full bg-gray-100 dark:bg-slate-950 flex flex-col items-center justify-center font-mono">
-            <h1 className="text-4xl text-emerald-600 dark:text-neon-green mb-4 font-display font-black">NEURAL LINK ESTABLISHED</h1>
-            <p className="text-slate-900 dark:text-white text-xl mb-8">EFFICIENCY: {Math.round((score / questions.length) * 100)}%</p>
-            <button onClick={onComplete} className="px-10 py-4 bg-slate-900 dark:bg-white text-white dark:text-black font-bold rounded hover:bg-emerald-600 dark:hover:bg-neon-green transition-colors">
-                ACCESS TIME CAPSULE
+        <div className="h-full w-full bg-parchment dark:bg-obsidian flex flex-col items-center justify-center font-display bg-paper-texture">
+            <h1 className="text-5xl text-magic-gold mb-4 font-bold drop-shadow-md">TRIAL COMPLETE</h1>
+            <p className="text-ink dark:text-parchment text-2xl mb-8 font-body italic">
+                MASTERY: {Math.round((score / questions.length) * 100)}%
+            </p>
+            <button onClick={onComplete} className="px-10 py-4 bg-ink text-parchment text-xl font-bold rounded-sm border-2 border-magic-gold hover:bg-crimson transition-colors shadow-lg">
+                OPEN THE GRIMOIRE
             </button>
         </div>
       );
   }
 
   return (
-    <div className={`h-full w-full bg-gray-50 dark:bg-slate-950 flex flex-col items-center justify-center font-mono relative overflow-hidden transition-colors duration-200
-        ${feedbackState === 'incorrect' ? 'bg-red-50 dark:bg-red-900/10' : ''}
-        ${feedbackState === 'correct' ? 'bg-emerald-50 dark:bg-emerald-900/10' : ''}
-    `}>
+    <div className={`h-full w-full bg-parchment dark:bg-obsidian flex flex-col items-center justify-center font-body relative overflow-hidden transition-colors duration-200 bg-paper-texture dark:bg-leather-texture`}>
       
-      {/* Dynamic Background */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(0,255,153,0.1),transparent_70%)] opacity-20" />
-      
-      <div className="z-10 w-full max-w-3xl px-6">
-          <div className="flex justify-between items-center mb-6 text-xs font-bold tracking-widest text-slate-500">
-              <div className="text-cyan-600 dark:text-neon-cyan">SYNC: {index + 1}/{questions.length}</div>
-              {streak > 1 && <div className="text-yellow-600 dark:text-neon-yellow animate-pulse">STREAK x{streak}</div>}
+      {/* Visual Feedback Overlay */}
+      {feedbackState === 'correct' && <div className="absolute inset-0 bg-emerald-rune/20 z-0" />}
+      {feedbackState === 'incorrect' && <div className="absolute inset-0 bg-crimson/20 z-0" />}
+
+      <div className="z-10 w-full max-w-4xl px-8 py-10 border-[6px] border-double border-ink/40 dark:border-magic-gold/40 rounded-lg bg-parchment/90 dark:bg-obsidian/90 shadow-2xl">
+          
+          <div className="flex justify-between items-center mb-8 font-rune text-lg text-ink/70 dark:text-parchment/70">
+              <div className="text-mystic-blue">Rune: {index + 1}/{questions.length}</div>
+              {streak > 1 && <div className="text-magic-gold animate-bounce">Streak x{streak}</div>}
           </div>
 
-          {/* Timer Bar */}
-          <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 mb-12 relative overflow-hidden">
+          {/* Candle Timer */}
+          <div className="w-full h-2 bg-ink/20 dark:bg-parchment/20 mb-12 relative rounded-full overflow-hidden">
              <motion.div 
                key={index}
                initial={{ width: "100%" }}
                animate={{ width: "0%" }}
                transition={{ duration: 15, ease: "linear" }}
-               className={`h-full ${timeLeft < 5 ? 'bg-red-500' : 'bg-emerald-500 dark:bg-neon-green'}`}
+               className={`h-full ${timeLeft < 5 ? 'bg-crimson shadow-[0_0_10px_red]' : 'bg-magic-gold shadow-[0_0_10px_gold]'}`}
              />
           </div>
 
           <AnimatePresence mode="wait">
               <motion.div
                 key={index}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.3 }}
               >
-                  <h2 className="text-2xl md:text-4xl text-slate-900 dark:text-white font-bold mb-10 leading-snug">
+                  <h2 className="text-3xl md:text-5xl text-ink dark:text-parchment font-display font-bold mb-12 leading-tight text-center">
                       {questions[index].q.split("_____").map((part, i) => (
                           <React.Fragment key={i}>
                               {part}
-                              {i === 0 && <span className="inline-block w-32 border-b-4 border-cyan-500 dark:border-neon-cyan mx-2 animate-pulse"></span>}
+                              {i === 0 && <span className="inline-block w-40 border-b-4 border-dotted border-mystic-blue mx-2"></span>}
                           </React.Fragment>
                       ))}
                   </h2>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {questions[index].options.map((opt, i) => (
                           <button
                             key={i}
                             onClick={() => handleAnswer(i)}
                             onMouseEnter={() => playSound('hover')}
-                            className="relative p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-900 dark:hover:border-white hover:bg-slate-50 dark:hover:bg-white dark:hover:text-black transition-all text-left group overflow-hidden text-slate-700 dark:text-slate-200 shadow-sm"
+                            className="relative p-6 bg-parchment dark:bg-black border-2 border-ink dark:border-gray-600 hover:border-magic-gold hover:shadow-[0_0_15px_#d4af37] transition-all text-left group overflow-hidden shadow-md"
                           >
-                              <span className="font-mono text-xs opacity-50 mr-4 group-hover:opacity-100">0{i + 1}</span>
-                              <span className="font-bold text-lg">{opt}</span>
+                              <span className="font-rune text-sm opacity-50 mr-4 group-hover:opacity-100 text-ink dark:text-parchment">
+                                {['I', 'II', 'III', 'IV'][i]}
+                              </span>
+                              <span className="font-bold text-xl text-ink dark:text-parchment font-display">{opt}</span>
                           </button>
                       ))}
                   </div>
               </motion.div>
           </AnimatePresence>
       </div>
-
-      {feedbackState === 'incorrect' && (
-          <div className="absolute inset-0 bg-red-500/10 pointer-events-none flex items-center justify-center z-50">
-              <span className="text-red-500 dark:text-white font-black text-9xl opacity-20 dark:opacity-50 dark:mix-blend-overlay">ERROR</span>
-          </div>
-      )}
     </div>
   );
 };

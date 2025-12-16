@@ -8,14 +8,14 @@ interface AssetSorterProps {
 }
 
 const cardsData = [
-  { text: "SCROLLING TIKTOK", type: "fritter", hint: "PASSIVE / NEGATIVE" },
-  { text: "LEARNING PYTHON", type: "invest", hint: "ACTIVE / POSITIVE" },
-  { text: "WAITING FOR FLIGHT", type: "kill", hint: "ACTIVE / NEUTRAL" },
-  { text: "RELAXING ON SUNDAY", type: "while", hint: "PASSIVE / POSITIVE" },
-  { text: "GAMING ALL NIGHT", type: "fritter", hint: "PASSIVE / NEGATIVE" },
-  { text: "GYM WORKOUT", type: "invest", hint: "ACTIVE / POSITIVE" },
-  { text: "SITTING BY RIVER", type: "while", hint: "PASSIVE / POSITIVE" },
-  { text: "BUYING JUNK FOOD", type: "fritter", hint: "PASSIVE / NEGATIVE" },
+  { text: "GAZING INTO ORBS", type: "fritter", hint: "PASSIVE / FOLLY" },
+  { text: "STUDYING RUNES", type: "invest", hint: "ACTIVE / WISDOM" },
+  { text: "AWAITING THE CARRIAGE", type: "kill", hint: "ACTIVE / IDLE" },
+  { text: "MEDITATING BY BROOK", type: "while", hint: "PASSIVE / RESTORATION" },
+  { text: "TAVERN GAMBLING", type: "fritter", hint: "PASSIVE / FOLLY" },
+  { text: "SWORD TRAINING", type: "invest", hint: "ACTIVE / WISDOM" },
+  { text: "SITTING IN GARDEN", type: "while", hint: "PASSIVE / RESTORATION" },
+  { text: "BUYING USELESS TRINKETS", type: "fritter", hint: "PASSIVE / FOLLY" },
 ];
 
 interface CardProps {
@@ -35,11 +35,11 @@ const Card: React.FC<CardProps> = ({ card, onSwipe, index }) => {
     [x, y],
     ([latestX, latestY]: number[]) => {
       const threshold = 50;
-      if (latestX > threshold && latestY < -threshold) return "#00ff99"; // Invest (Green)
-      if (latestX < -threshold && latestY > threshold) return "#ff0055"; // Fritter (Red)
-      if (latestX < -threshold && latestY < -threshold) return "#00f3ff"; // Kill (Cyan)
-      if (latestX > threshold && latestY > threshold) return "#facc15"; // While (Yellow)
-      return "#334155"; // Default Slate
+      if (latestX > threshold && latestY < -threshold) return "#50c878"; // Invest (Emerald)
+      if (latestX < -threshold && latestY > threshold) return "#8a0303"; // Fritter (Crimson)
+      if (latestX < -threshold && latestY < -threshold) return "#4b9cd3"; // Kill (Blue)
+      if (latestX > threshold && latestY > threshold) return "#d4af37"; // While (Gold)
+      return "#2c1810"; // Default Ink
     }
   );
 
@@ -68,20 +68,28 @@ const Card: React.FC<CardProps> = ({ card, onSwipe, index }) => {
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={0.7}
       onDragEnd={handleDragEnd}
-      className="absolute w-72 h-96 bg-white dark:bg-black border-4 shadow-2xl flex flex-col items-center justify-center p-6 text-center rounded-sm cursor-grab active:cursor-grabbing backdrop-blur-md"
+      className="absolute w-72 h-[26rem] bg-parchment dark:bg-obsidian border-[6px] shadow-2xl flex flex-col items-center justify-between p-6 text-center rounded-xl cursor-grab active:cursor-grabbing bg-paper-texture dark:bg-leather-texture"
     >
-        <div className="absolute top-2 left-2 w-2 h-2 bg-slate-300 dark:bg-slate-700 rounded-full" />
-        <div className="absolute top-2 right-2 w-2 h-2 bg-slate-300 dark:bg-slate-700 rounded-full" />
-        <div className="absolute bottom-2 left-2 w-2 h-2 bg-slate-300 dark:bg-slate-700 rounded-full" />
-        <div className="absolute bottom-2 right-2 w-2 h-2 bg-slate-300 dark:bg-slate-700 rounded-full" />
-        
-        <h2 className="text-slate-900 dark:text-white font-display text-2xl font-bold leading-tight select-none drop-shadow-sm">
-            {card.text}
-        </h2>
-        
-        <motion.div style={{ opacity: useTransform(x, [-50, 0, 50], [1, 0, 1]) }} className="absolute bottom-10 text-[10px] font-mono text-slate-500 border border-slate-200 dark:border-slate-800 px-2 py-1 bg-gray-50 dark:bg-black">
-            {card.hint}
-        </motion.div>
+        {/* Card Design Elements */}
+        <div className="w-full h-full border-2 border-double border-ink/20 dark:border-magic-gold/30 rounded-lg p-4 flex flex-col items-center justify-center relative">
+            
+            {/* Corner Runes */}
+            <span className="absolute top-0 left-0 text-2xl text-ink/40 dark:text-magic-gold/40">♠</span>
+            <span className="absolute bottom-0 right-0 text-2xl text-ink/40 dark:text-magic-gold/40">♠</span>
+
+            {/* Illustration Placeholder */}
+            <div className="w-32 h-32 rounded-full border-2 border-ink dark:border-parchment mb-6 flex items-center justify-center bg-ink/5 dark:bg-white/5">
+                <span className="text-4xl">🔮</span>
+            </div>
+
+            <h2 className="text-ink dark:text-parchment font-display text-2xl font-bold leading-tight select-none">
+                {card.text}
+            </h2>
+            
+            <motion.div style={{ opacity: useTransform(x, [-50, 0, 50], [1, 0, 1]) }} className="mt-4 font-rune text-xs text-ink/60 dark:text-parchment/60 uppercase tracking-widest">
+                {card.hint}
+            </motion.div>
+        </div>
     </motion.div>
   );
 };
@@ -101,12 +109,12 @@ const AssetSorter: React.FC<AssetSorterProps> = ({ onComplete, updateLife }) => 
         setCombo(c => c + 1);
         updateLife(1); 
         playSound('success');
-        setFeedback({ msg: `${direction.toUpperCase()} CONFIRMED`, color: "text-emerald-600 dark:text-neon-green" });
+        setFeedback({ msg: "FATE SEALED", color: "text-emerald-rune" });
     } else {
         setCombo(0);
         updateLife(-3);
         playSound('error');
-        setFeedback({ msg: "DATA CORRUPTION", color: "text-red-600 dark:text-neon-pink" });
+        setFeedback({ msg: "A POOR OMEN", color: "text-crimson" });
     }
 
     setIndex(prev => prev + 1);
@@ -116,42 +124,36 @@ const AssetSorter: React.FC<AssetSorterProps> = ({ onComplete, updateLife }) => 
   };
 
   return (
-    <div className="h-full w-full flex items-center justify-center relative font-mono overflow-hidden">
+    <div className="h-full w-full flex items-center justify-center relative font-body overflow-hidden">
       
-      {/* Background Matrix UI */}
-      <div className="absolute inset-0 pointer-events-none">
-         {/* Grid Lines */}
-         <div className="absolute left-1/2 top-0 bottom-0 w-px bg-slate-200 dark:bg-slate-800" />
-         <div className="absolute top-1/2 left-0 right-0 h-px bg-slate-200 dark:bg-slate-800" />
+      {/* Background Table */}
+      <div className="absolute inset-0 pointer-events-none opacity-30">
+         {/* Quadrant Lines */}
+         <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-ink/20 dark:bg-parchment/10 border-l border-r border-dotted" />
+         <div className="absolute top-1/2 left-0 right-0 h-1 bg-ink/20 dark:bg-parchment/10 border-t border-b border-dotted" />
 
          {/* Quadrant Watermarks */}
-         <div className="absolute top-10 left-10 text-4xl font-display font-black text-slate-200 dark:text-slate-900 select-none opacity-50 dark:opacity-50">KILL</div>
-         <div className="absolute top-10 right-10 text-4xl font-display font-black text-slate-200 dark:text-slate-900 select-none opacity-50 dark:opacity-50">INVEST</div>
-         <div className="absolute bottom-10 left-10 text-4xl font-display font-black text-slate-200 dark:text-slate-900 select-none opacity-50 dark:opacity-50">FRITTER</div>
-         <div className="absolute bottom-10 right-10 text-4xl font-display font-black text-slate-200 dark:text-slate-900 select-none opacity-50 dark:opacity-50">WHILE</div>
-
-         {/* Axis Labels */}
-         <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[10px] text-emerald-600 dark:text-neon-green tracking-widest bg-white dark:bg-black px-2 border border-emerald-500 dark:border-neon-green">ACTIVE</div>
-         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 tracking-widest">PASSIVE</div>
-         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] text-red-500 dark:text-neon-pink tracking-widest -rotate-90">NEGATIVE</div>
-         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-yellow-500 dark:text-neon-yellow tracking-widest rotate-90">POSITIVE</div>
+         <div className="absolute top-10 left-10 text-4xl font-display font-bold text-ink dark:text-parchment opacity-30">KILL</div>
+         <div className="absolute top-10 right-10 text-4xl font-display font-bold text-ink dark:text-parchment opacity-30">INVEST</div>
+         <div className="absolute bottom-10 left-10 text-4xl font-display font-bold text-ink dark:text-parchment opacity-30">FRITTER</div>
+         <div className="absolute bottom-10 right-10 text-4xl font-display font-black text-ink dark:text-parchment opacity-30">WHILE</div>
       </div>
 
       {/* Combo Meter */}
-      <div className="absolute top-20 right-10 text-right">
-          <div className="text-[10px] text-slate-500">COMBO CHAIN</div>
+      <div className="absolute top-24 right-10 text-right">
+          <div className="text-sm font-rune text-ink dark:text-parchment">Spell Chain</div>
           <motion.div 
             key={combo} 
             initial={{ scale: 1.5 }} 
-            animate={{ scale: 1, color: combo > 2 ? (document.documentElement.classList.contains('dark') ? '#00ff99' : '#059669') : 'currentColor' }}
-            className="text-4xl font-display font-black text-slate-900 dark:text-white"
+            animate={{ scale: 1 }}
+            className={`text-5xl font-display font-bold ${combo > 2 ? 'text-magic-gold drop-shadow-md' : 'text-ink dark:text-parchment'}`}
           >
              x{combo}
           </motion.div>
       </div>
 
       {/* Card Stack */}
-      <div className="relative w-72 h-96 z-10">
+      <div className="relative w-72 h-[26rem] z-10">
          <AnimatePresence>
             {index < cardsData.length ? (
                 cardsData.slice(index).reverse().map((card, i) => (
@@ -160,10 +162,10 @@ const AssetSorter: React.FC<AssetSorterProps> = ({ onComplete, updateLife }) => 
             ) : (
                 <motion.div 
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    className="w-full h-full flex flex-col items-center justify-center bg-white/80 dark:bg-black/80 border border-emerald-500 dark:border-neon-green rounded-xl"
+                    className="w-full h-full flex flex-col items-center justify-center bg-parchment border-4 border-magic-gold rounded-xl shadow-2xl p-6 text-center"
                 >
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">MATRIX ALIGNED</h2>
-                    <div className="w-8 h-8 border-2 border-t-emerald-500 dark:border-t-neon-green border-r-transparent border-b-emerald-500 dark:border-b-neon-green border-l-transparent rounded-full animate-spin"></div>
+                    <h2 className="text-2xl font-display font-bold text-ink mb-4">The Deck is Empty</h2>
+                    <p className="font-body italic text-lg">"Your choices have been woven into the tapestry."</p>
                 </motion.div>
             )}
          </AnimatePresence>
@@ -171,7 +173,7 @@ const AssetSorter: React.FC<AssetSorterProps> = ({ onComplete, updateLife }) => 
 
       {/* Feedback text */}
       {feedback && (
-          <div className={`absolute bottom-20 font-display text-xl font-bold tracking-widest ${feedback.color} animate-pulse`}>
+          <div className={`absolute bottom-16 font-display text-2xl font-bold tracking-widest ${feedback.color} animate-pulse drop-shadow-md`}>
               {feedback.msg}
           </div>
       )}

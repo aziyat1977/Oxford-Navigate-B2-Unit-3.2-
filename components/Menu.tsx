@@ -10,12 +10,12 @@ interface MenuProps {
 }
 
 const menuItems = [
-  { id: 'home', label: 'HOME / TERMINAL' },
-  { id: 'diagnostic', label: '01. DIAGNOSTIC AUDIT' },
-  { id: 'sorter', label: '02. ASSET ALLOCATION' },
-  { id: 'timeline', label: '03. TIMELINE DECRYPTION' },
-  { id: 'neural', label: '04. NEURAL CALIBRATION' },
-  { id: 'capsule', label: '05. TIME CAPSULE' },
+  { id: 'home', label: 'I. The Grand Hall' },
+  { id: 'diagnostic', label: 'II. Attunement Ritual' },
+  { id: 'sorter', label: 'III. The Tarot of Fate' },
+  { id: 'timeline', label: 'IV. Prophecy Scrolls' },
+  { id: 'neural', label: 'V. Trial of Wits' },
+  { id: 'capsule', label: 'VI. Inscribe Legacy' },
 ];
 
 const Menu: React.FC<MenuProps> = ({ currentView, setView, darkMode, toggleTheme }) => {
@@ -34,62 +34,68 @@ const Menu: React.FC<MenuProps> = ({ currentView, setView, darkMode, toggleTheme
 
   return (
     <>
-      {/* Top Bar */}
+      {/* Top Bar - Wax Seal Button */}
       <div className="fixed top-0 left-0 w-full z-50 flex justify-between items-center p-4 md:p-6 pointer-events-none">
-        {/* Hamburger */}
+        
+        {/* The Wax Seal (Menu Button) */}
         <button 
           onClick={toggleMenu}
-          className="pointer-events-auto bg-black/50 dark:bg-black/50 backdrop-blur border border-slate-500 text-white p-3 rounded hover:bg-neon-green hover:border-neon-green hover:text-black transition-all group"
+          className="pointer-events-auto bg-crimson border-4 border-double border-magic-gold text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform group"
         >
-          <div className="space-y-1">
-            <div className={`w-6 h-0.5 bg-current transition-all ${isOpen ? 'rotate-45 translate-y-1.5' : ''}`}></div>
-            <div className={`w-6 h-0.5 bg-current transition-all ${isOpen ? 'opacity-0' : ''}`}></div>
-            <div className={`w-6 h-0.5 bg-current transition-all ${isOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></div>
-          </div>
+           <span className="font-display font-bold text-xl">{isOpen ? 'X' : 'M'}</span>
         </button>
 
-        {/* Theme Toggle */}
+        {/* Theme Toggle (Sun/Moon Amulet) */}
         <button 
           onClick={() => { playSound('click'); toggleTheme(); }}
-          className="pointer-events-auto bg-black/50 dark:bg-black/50 backdrop-blur border border-slate-500 text-white p-3 rounded hover:bg-white hover:text-black transition-all font-mono text-xs uppercase"
+          className="pointer-events-auto bg-ink dark:bg-parchment text-parchment dark:text-ink w-12 h-12 rounded-full border-2 border-magic-gold flex items-center justify-center shadow-[0_0_15px_#d4af37]"
         >
-          {darkMode ? 'Light Mode' : 'Dark Mode'}
+          {darkMode ? '☀' : '☾'}
         </button>
       </div>
 
-      {/* Full Screen Menu Overlay */}
+      {/* Full Screen Spellbook Overlay */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ x: '-100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '-100%' }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed inset-0 z-40 bg-gray-100 dark:bg-slate-900 flex flex-col justify-center items-start p-10 md:p-20 border-r-4 border-slate-900 dark:border-neon-green"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
           >
-             <div className="mb-10 text-xs text-slate-500 font-mono tracking-widest uppercase">
-               Navigation System v4.2
-             </div>
+             {/* The Book Page */}
+             <div className="bg-parchment dark:bg-obsidian w-full max-w-lg h-[80vh] rounded-lg shadow-[0_0_50px_rgba(0,0,0,0.8)] border-8 border-double border-ink dark:border-magic-gold relative overflow-hidden flex flex-col p-8 md:p-12 text-center bg-paper-texture dark:bg-leather-texture">
+                
+                <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-magic-gold" />
+                <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-magic-gold" />
+                <div className="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-magic-gold" />
+                <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-magic-gold" />
 
-             <div className="flex flex-col gap-4">
-               {menuItems.map((item) => (
-                 <button
-                   key={item.id}
-                   onClick={() => handleNav(item.id)}
-                   onMouseEnter={() => playSound('hover')}
-                   className={`text-left text-2xl md:text-5xl font-display font-black tracking-tighter transition-all hover:translate-x-4
-                     ${currentView === item.id 
-                       ? 'text-emerald-600 dark:text-neon-green' 
-                       : 'text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-white'
-                     }`}
-                 >
-                   {item.label}
-                 </button>
-               ))}
-             </div>
+                <h2 className="text-3xl font-display font-bold text-ink dark:text-magic-gold mb-8 border-b-2 border-ink dark:border-gray-700 pb-4">
+                  Table of Contents
+                </h2>
 
-             <div className="mt-auto text-xs font-mono text-slate-400">
-                TEMPORA AGENCY &copy; 2040
+                <div className="flex flex-col gap-6 overflow-y-auto">
+                   {menuItems.map((item) => (
+                     <button
+                       key={item.id}
+                       onClick={() => handleNav(item.id)}
+                       onMouseEnter={() => playSound('hover')}
+                       className={`font-body text-2xl md:text-3xl transition-all hover:scale-105 italic
+                         ${currentView === item.id 
+                           ? 'text-crimson font-bold decoration-wavy underline' 
+                           : 'text-ink dark:text-parchment hover:text-mystic-blue'
+                         }`}
+                     >
+                       {item.label}
+                     </button>
+                   ))}
+                </div>
+
+                <div className="mt-auto text-sm font-rune text-ink/60 dark:text-parchment/60">
+                   "Time waits for no wizard."
+                </div>
              </div>
           </motion.div>
         )}
