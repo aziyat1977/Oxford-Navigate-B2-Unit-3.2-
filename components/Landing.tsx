@@ -3,54 +3,45 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface LandingProps {
   onComplete: () => void;
+  updateLife: (years: number) => void;
 }
 
 const diagnosticQuestions = [
   { q: "Don't call me at 8:00. I _____ the football match.", options: ["will have watched", "will be watching"], a: 1 },
   { q: "By the time we get there, the store _____.", options: ["will be closing", "will have closed"], a: 1 },
   { q: "This time next year, I _____ in London.", options: ["will have lived", "will be living"], a: 1 },
-  { q: "_____ the report by Friday?", options: ["Will you have finished", "Will you be finishing"], a: 0 },
-  { q: "In 2050, everyone _____ electric cars.", options: ["will be driving", "will have driven"], a: 0 },
   { q: "I _____ tomorrow, so let's meet for coffee.", options: ["won't have worked", "won't be working"], a: 1 },
-  { q: "By the end of the trip, we _____ five countries.", options: ["will be visiting", "will have visited"], a: 1 },
-  { q: "At midnight, I _____, so please be quiet.", options: ["will have slept", "will be sleeping"], a: 1 },
-  { q: "She _____ her first book by the age of 25.", options: ["will have written", "will be writing"], a: 0 },
-  { q: "The government says they _____ the bridge by 2030.", options: ["will have built", "will be building"], a: 0 },
-  { q: "Unfortunately, at the party, I _____ for my exam.", options: ["will be studying", "will have studied"], a: 0 },
   { q: "By 10 PM, I _____ all the pizza.", options: ["will be eating", "will have eaten"], a: 1 },
-  { q: "Can we meet later? I _____ for a call right now.", options: ["will have waited", "will be waiting"], a: 1 },
-  { q: "In ten years' time, robots _____ all the hard work.", options: ["will be doing", "will have done"], a: 0 },
-  { q: "By next June, we _____ married for 10 years.", options: ["will have been", "will be being"], a: 0 },
 ];
 
-const Landing: React.FC<LandingProps> = ({ onComplete }) => {
+const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
   const [phase, setPhase] = useState<'countdown' | 'scan' | 'diagnostic' | 'result'>('countdown');
   const [count, setCount] = useState(86400);
-  const [progress, setProgress] = useState(0);
   const [isHolding, setIsHolding] = useState(false);
   const [qIndex, setQIndex] = useState(0);
   const [score, setScore] = useState(0);
+  const [progress, setProgress] = useState(0);
   const requestRef = useRef<number>();
 
-  // Phase 1: Countdown
+  // Countdown Effect
   useEffect(() => {
     const interval = setInterval(() => {
-      setCount((prev) => Math.max(0, prev - Math.floor(Math.random() * 123)));
+      setCount((prev) => Math.max(0, prev - Math.floor(Math.random() * 243)));
     }, 50);
     if (phase !== 'countdown') clearInterval(interval);
     return () => clearInterval(interval);
   }, [phase]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setPhase('scan'), 2500);
+    const timer = setTimeout(() => setPhase('scan'), 3000);
     return () => clearTimeout(timer);
   }, []);
 
-  // Phase 2: Scanner Logic
+  // Biometric Scan Logic
   const updateProgress = () => {
     if (isHolding) {
       setProgress((prev) => {
-        const next = prev + 1; 
+        const next = prev + 1.5; 
         if (next >= 100) {
           setPhase('diagnostic');
           return 100;
@@ -67,10 +58,13 @@ const Landing: React.FC<LandingProps> = ({ onComplete }) => {
     return () => { if (requestRef.current) cancelAnimationFrame(requestRef.current); };
   }, [isHolding]);
 
-  // Phase 3: Diagnostic Logic
+  // Quiz Logic
   const handleAnswer = (optionIndex: number) => {
     if (optionIndex === diagnosticQuestions[qIndex].a) {
         setScore(prev => prev + 1);
+        updateLife(2); // Bonus years for correct logic
+    } else {
+        updateLife(-2); // Cost of failure
     }
     
     if (qIndex + 1 < diagnosticQuestions.length) {
@@ -82,35 +76,45 @@ const Landing: React.FC<LandingProps> = ({ onComplete }) => {
 
   useEffect(() => {
       if (phase === 'result') {
-          const timer = setTimeout(onComplete, 4000);
+          const timer = setTimeout(onComplete, 4500);
           return () => clearTimeout(timer);
       }
   }, [phase, onComplete]);
 
-  return (
-    <div className="h-screen w-full bg-dark-bg flex flex-col items-center justify-center relative overflow-hidden select-none font-mono text-white">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,153,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,153,0.02)_1px,transparent_1px)] bg-[size:30px_30px] pointer-events-none" />
+  // Persona Logic based on score
+  const getPersona = () => {
+      if (score === 5) return { title: "CHRONO-ARCHITECT", color: "text-neon-green", desc: "Temporal awareness maximum." };
+      if (score >= 3) return { title: "TIME DRIFTER", color: "text-neon-yellow", desc: "Potential detected. Calibration needed." };
+      return { title: "ENTROPY VICTIM", color: "text-neon-pink", desc: "Urgent intervention required." };
+  };
 
+  return (
+    <div className="h-screen w-full flex flex-col items-center justify-center relative select-none font-mono text-white">
+      
       <AnimatePresence mode="wait">
         
-        {/* PHASE 1 & 2: INTRO */}
-        {(phase === 'countdown' || phase === 'scan') && (
+        {/* PHASE 1: THE DROP */}
+        {phase === 'countdown' && (
+             <motion.div key="intro" exit={{opacity: 0}} className="text-center z-20">
+                 <h2 className="text-neon-green text-xs tracking-[1em] mb-4 animate-pulse">INITIATING DROP</h2>
+                 <h1 className="text-9xl font-display font-black text-white mix-blend-overlay">
+                    {count.toLocaleString()}
+                 </h1>
+             </motion.div>
+        )}
+
+        {/* PHASE 2: BIOMETRIC SCAN */}
+        {phase === 'scan' && (
           <motion.div 
             key="scan-ui"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.9 }}
             className="flex flex-col items-center z-10"
           >
-            <div className="text-center mb-12">
-               <h2 className="text-neon-green text-xs tracking-[0.5em] mb-4 animate-pulse">TEMPORAL AGENCY</h2>
-               <h1 className="text-7xl md:text-9xl font-display font-black text-white mix-blend-screen drop-shadow-[0_0_15px_rgba(0,255,153,0.5)]">
-                 {count.toLocaleString()}
-               </h1>
-               <p className="mt-4 text-slate-500 text-xs uppercase tracking-widest">
-                 TIME = MONEY <span className="mx-2">|</span> STATUS: <span className="text-white">UNVERIFIED</span>
-               </p>
-            </div>
+             <p className="mb-8 text-xs text-slate-500 uppercase tracking-widest text-center">
+                 Identity Verification Required <br/>
+                 <span className="text-neon-pink">Do not remove finger</span>
+             </p>
 
-            {phase === 'scan' && (
               <div 
                 className="relative group cursor-pointer"
                 onMouseDown={() => setIsHolding(true)}
@@ -120,93 +124,98 @@ const Landing: React.FC<LandingProps> = ({ onComplete }) => {
                 onTouchEnd={() => setIsHolding(false)}
               >
                  <motion.div 
-                   className="w-24 h-32 border border-slate-700 bg-slate-900/50 rounded-lg flex items-center justify-center relative overflow-hidden"
-                   whileTap={{ scale: 0.95 }}
+                   className="w-32 h-40 border border-slate-800 bg-slate-900/80 rounded flex items-center justify-center relative overflow-hidden"
+                   whileTap={{ scale: 0.98 }}
                  >
                     {isHolding && (
-                      <motion.div className="absolute w-full h-1 bg-neon-green shadow-[0_0_20px_#00ff99] z-20"
-                        animate={{ top: ['0%', '100%', '0%'] }} transition={{ repeat: Infinity, duration: 1 }}
+                      <motion.div className="absolute w-full h-1 bg-neon-green shadow-[0_0_30px_#00ff99] z-20"
+                        animate={{ top: ['0%', '100%', '0%'] }} transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
                       />
                     )}
-                    <svg className={`w-12 h-12 ${isHolding ? 'text-neon-green' : 'text-slate-600'} transition-colors`} fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8 8z"/>
+                    
+                    <svg className={`w-16 h-16 ${isHolding ? 'text-neon-green' : 'text-slate-700'} transition-colors duration-200`} fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 14 3 12.01 3c-1.98 0-3.86.47-5.57 1.41-.24.13-.54.04-.68-.2-.13-.24-.04-.55.2-.68C7.82 2.52 9.86 2 12.01 2c2.13 0 3.99.47 6.03 1.52.25.13.34.43.21.67-.09.18-.26.28-.44.28zM3.5 9.71c-.16 0-.32-.1-.4-.26-.11-.22-.2-.44-.28-.67-.1-.28.05-.58.32-.67.28-.1.58.05.67.32.08.23.16.44.26.66.1.2.02.44-.19.56-.12.04-.26.06-.38.06zm17.6 2.54c-.26-.06-.42-.32-.36-.58.05-.23.1-.46.13-.68.04-.29.3-.49.58-.45.29.04.49.3.45.58-.04.24-.09.49-.14.74-.04.2-.21.35-.41.39-.08.01-.17 0-.25 0zM12 20c-3.1 0-5.83-1.66-7.38-4.14-.15-.24-.08-.55.16-.7.24-.15.55-.08.7.16C6.79 17.52 9.24 19 12 19c2.76 0 5.21-1.48 6.52-3.68.15-.24.46-.31.7-.16.24.15.31.46.16.7C17.83 18.34 15.1 20 12 20z"/>
                     </svg>
+
+                    {/* Glitch Overlay within button */}
+                    {isHolding && <div className="absolute inset-0 bg-neon-green/10 animate-pulse" />}
                  </motion.div>
                  
-                 <svg className="absolute -top-3 -left-3 w-30 h-38 pointer-events-none w-[120px] h-[150px]" viewBox="0 0 120 150">
-                    <motion.path 
-                       d="M 60 10 A 50 50 0 0 1 60 140 A 50 50 0 0 1 60 10"
-                       fill="none" stroke="#00ff99" strokeWidth="2"
-                       strokeDasharray="360"
-                       strokeDashoffset={360 - (360 * progress) / 100}
+                 {/* Radial Progress */}
+                 <svg className="absolute -top-4 -left-4 w-40 h-48 pointer-events-none" viewBox="0 0 100 120">
+                    <circle cx="50" cy="60" r="48" stroke="#1e293b" strokeWidth="2" fill="none" />
+                    <motion.circle 
+                       cx="50" cy="60" r="48"
+                       stroke="#00ff99" strokeWidth="2" fill="none"
+                       strokeDasharray="300"
+                       strokeDashoffset={300 - (300 * progress) / 100}
+                       strokeLinecap="round"
+                       transform="rotate(-90 50 60)"
                     />
                  </svg>
-                 <div className="absolute -bottom-10 left-0 w-full text-center text-[10px] text-neon-green font-mono">
-                    {isHolding ? `LOADING DIAGNOSTIC...` : "HOLD TO LOGIN"}
-                 </div>
               </div>
-            )}
           </motion.div>
         )}
 
-        {/* PHASE 3: DIAGNOSTIC QUIZ */}
+        {/* PHASE 3: DIAGNOSTIC */}
         {phase === 'diagnostic' && (
           <motion.div
             key="quiz-ui"
-            initial={{ opacity: 0, x: 100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -100 }}
-            className="w-full max-w-2xl px-6 z-20"
+            initial={{ opacity: 0, filter: "blur(10px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, x: -100 }}
+            className="w-full max-w-xl px-6 z-20"
           >
-             <div className="flex justify-between items-end mb-6 border-b border-slate-800 pb-2">
-                 <h3 className="text-neon-pink text-xs font-bold tracking-widest">PLACEMENT TEST</h3>
-                 <span className="font-mono text-slate-500 text-xs">{qIndex + 1} / {diagnosticQuestions.length}</span>
+             <div className="flex justify-between items-center mb-10">
+                 <div className="flex items-center gap-2">
+                     <div className="w-2 h-2 bg-neon-pink animate-pulse"></div>
+                     <span className="text-[10px] text-neon-pink font-bold tracking-widest uppercase">Live Audit</span>
+                 </div>
+                 <div className="font-mono text-slate-500 text-xs">Q.{qIndex + 1}_05</div>
              </div>
 
-             <motion.div 
-                key={qIndex}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-8"
-             >
-                 <p className="text-2xl md:text-3xl font-display leading-tight">
+             <motion.div key={qIndex} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                 <p className="text-2xl md:text-3xl font-display leading-relaxed mb-10">
                     {diagnosticQuestions[qIndex].q.split("_____").map((part, i) => (
                         <React.Fragment key={i}>
                             {part}
-                            {i === 0 && <span className="inline-block w-20 border-b-2 border-neon-green animate-pulse mx-2"></span>}
+                            {i === 0 && <span className="inline-block w-24 border-b-2 border-slate-600 mx-2"></span>}
                         </React.Fragment>
                     ))}
                  </p>
              </motion.div>
 
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <div className="flex flex-col gap-3">
                  {diagnosticQuestions[qIndex].options.map((opt, i) => (
                      <button
                         key={i}
                         onClick={() => handleAnswer(i)}
-                        className="p-6 border border-slate-700 hover:border-neon-green hover:bg-neon-green/10 text-left transition-all rounded group"
+                        className="group relative p-4 border border-slate-800 bg-slate-900/50 hover:bg-neon-green/10 hover:border-neon-green text-left transition-all overflow-hidden"
                      >
-                         <span className="text-slate-500 mr-4 group-hover:text-neon-green">{String.fromCharCode(65 + i)})</span>
-                         <span className="font-mono text-lg">{opt}</span>
+                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-800 group-hover:bg-neon-green transition-colors" />
+                         <span className="relative z-10 font-mono text-sm md:text-base pl-4 group-hover:pl-6 transition-all">{opt}</span>
                      </button>
                  ))}
              </div>
           </motion.div>
         )}
 
-        {/* PHASE 4: RESULT */}
+        {/* PHASE 4: RESULT / PERSONA */}
         {phase === 'result' && (
           <motion.div
              key="result-ui"
              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-             className="text-center z-20"
+             className="text-center z-20 px-4"
           >
-             <h1 className="text-6xl font-display font-black text-white mb-2">
-               SCORE: <span className={score > 10 ? "text-neon-green" : "text-neon-pink"}>{Math.round((score / 15) * 100)}%</span>
+             <div className="mb-2 text-[10px] text-slate-500 uppercase tracking-widest">Analysis Complete</div>
+             <h1 className={`text-5xl md:text-7xl font-display font-black mb-4 ${getPersona().color} animate-glitch`}>
+               {getPersona().title}
              </h1>
-             <p className="font-mono text-slate-400 mb-8 uppercase tracking-widest">
-                {score > 12 ? "Advanced Knowledge Detected" : "Temporal Dissonance Detected"}
+             <p className="font-mono text-white mb-8 border-t border-b border-slate-800 py-4 max-w-md mx-auto">
+                {getPersona().desc}
              </p>
-             <div className="inline-block px-6 py-2 border border-neon-green text-neon-green font-bold animate-pulse">
-                 INITIATING TRAINING PROTOCOL...
+             <div className="flex justify-center gap-2">
+                 <div className="w-1 h-8 bg-neon-green animate-scan"></div>
+                 <div className="w-1 h-8 bg-neon-green animate-scan delay-75"></div>
+                 <div className="w-1 h-8 bg-neon-green animate-scan delay-150"></div>
              </div>
           </motion.div>
         )}

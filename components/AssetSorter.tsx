@@ -3,24 +3,18 @@ import { motion, useMotionValue, useTransform, AnimatePresence, PanInfo } from '
 
 interface AssetSorterProps {
   onComplete: () => void;
+  updateLife: (years: number) => void;
 }
 
-// PART 3: PRE-TEACH VOCABULARY
-// Logic:
-// FRITTER AWAY: Negative / Passive (Wasting little by little) -> Bottom Left
-// INVEST: Positive / Active (Building value) -> Top Right
-// WHILE AWAY: Positive / Passive (Relaxing) -> Bottom Right
-// KILL TIME: Neutral/Active (Waiting) -> Top Left
-
 const cardsData = [
-  { text: "SCROLLING TIKTOK", type: "fritter", hint: "Negative / Passive: Wasting time in small chunks" },
-  { text: "LEARNING ENGLISH", type: "invest", hint: "Positive / Active: Future benefit" },
-  { text: "WAITING FOR TRAIN", type: "kill", hint: "Neutral: Making time pass quickly" },
-  { text: "READING A NOVEL", type: "while", hint: "Positive / Passive: Pleasant relaxation" },
-  { text: "PLAYING VIDEO GAMES ALL WEEKEND", type: "fritter", hint: "Negative: Regret later" },
-  { text: "GOING TO THE GYM", type: "invest", hint: "Active: Health benefits" },
-  { text: "SITTING BY THE RIVER", type: "while", hint: "Passive: Enjoying the moment" },
-  { text: "BUYING CLOTHES YOU DON'T NEED", type: "fritter", hint: "Negative: Money/Time waste" },
+  { text: "SCROLLING TIKTOK", type: "fritter", hint: "PASSIVE / NEGATIVE" },
+  { text: "LEARNING PYTHON", type: "invest", hint: "ACTIVE / POSITIVE" },
+  { text: "WAITING FOR FLIGHT", type: "kill", hint: "ACTIVE / NEUTRAL" },
+  { text: "RELAXING ON SUNDAY", type: "while", hint: "PASSIVE / POSITIVE" },
+  { text: "GAMING ALL NIGHT", type: "fritter", hint: "PASSIVE / NEGATIVE" },
+  { text: "GYM WORKOUT", type: "invest", hint: "ACTIVE / POSITIVE" },
+  { text: "SITTING BY RIVER", type: "while", hint: "PASSIVE / POSITIVE" },
+  { text: "BUYING JUNK FOOD", type: "fritter", hint: "PASSIVE / NEGATIVE" },
 ];
 
 interface CardProps {
@@ -32,22 +26,23 @@ interface CardProps {
 const Card: React.FC<CardProps> = ({ card, onSwipe, index }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const rotate = useTransform(x, [-200, 200], [-15, 15]);
+  const rotate = useTransform(x, [-200, 200], [-10, 10]);
   const opacity = useTransform(x, [-300, 0, 300], [0, 1, 0]);
+  const scale = useTransform(index, [0, 1, 2], [1, 0.95, 0.9]);
 
-  const color = useTransform(
+  const borderColor = useTransform(
     [x, y],
     ([latestX, latestY]: number[]) => {
-      if (Math.abs(latestX) < 20 && Math.abs(latestY) < 20) return "#334155"; 
-      if (latestX > 0 && latestY < 0) return "#00ff99"; // Top-Right (Invest)
-      if (latestX < 0 && latestY > 0) return "#ff0055"; // Bottom-Left (Fritter)
-      if (latestX < 0 && latestY < 0) return "#00f3ff"; // Top-Left (Kill)
-      if (latestX > 0 && latestY > 0) return "#fbbf24"; // Bottom-Right (While)
+      const threshold = 50;
+      if (latestX > threshold && latestY < -threshold) return "#00ff99"; // Invest (Green)
+      if (latestX < -threshold && latestY > threshold) return "#ff0055"; // Fritter (Red)
+      if (latestX < -threshold && latestY < -threshold) return "#00f3ff"; // Kill (Cyan)
+      if (latestX > threshold && latestY > threshold) return "#facc15"; // While (Yellow)
       return "#334155";
     }
   );
 
-  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+  const handleDragEnd = (_: any, info: PanInfo) => {
     const threshold = 100;
     const { x: ox, y: oy } = info.offset;
 
@@ -64,41 +59,49 @@ const Card: React.FC<CardProps> = ({ card, onSwipe, index }) => {
 
   return (
     <motion.div
-      style={{ x, y, rotate, opacity, borderColor: color, zIndex: 100 - index }}
+      style={{ x, y, rotate, opacity, scale, borderColor, zIndex: 100 - index }}
       drag
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-      dragElastic={0.6}
+      dragElastic={0.7}
       onDragEnd={handleDragEnd}
-      whileHover={{ scale: 1.05, cursor: "grab" }}
-      whileTap={{ cursor: "grabbing" }}
-      className="absolute w-72 h-96 bg-black/90 rounded-2xl flex flex-col items-center justify-center border-4 shadow-[0_0_30px_rgba(0,0,0,0.5)] backdrop-blur-xl p-6 text-center"
+      className="absolute w-72 h-96 bg-black border-4 shadow-2xl flex flex-col items-center justify-center p-6 text-center rounded-sm cursor-grab active:cursor-grabbing backdrop-blur-md"
     >
-        <div className="absolute top-4 left-4 font-mono text-[10px] text-slate-500">ASSET_ID: {Math.floor(Math.random() * 9999)}</div>
-        <h2 className="text-white font-display text-3xl font-bold leading-tight select-none mb-4">
+        <div className="absolute top-2 left-2 w-2 h-2 bg-slate-700 rounded-full" />
+        <div className="absolute top-2 right-2 w-2 h-2 bg-slate-700 rounded-full" />
+        <div className="absolute bottom-2 left-2 w-2 h-2 bg-slate-700 rounded-full" />
+        <div className="absolute bottom-2 right-2 w-2 h-2 bg-slate-700 rounded-full" />
+        
+        <h2 className="text-white font-display text-2xl font-bold leading-tight select-none drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
             {card.text}
         </h2>
-        <div className="absolute bottom-4 left-0 w-full text-xs font-mono text-slate-400 px-4">{card.hint}</div>
+        
+        {/* Helper Hint fades in on drag */}
+        <motion.div style={{ opacity: useTransform(x, [-50, 0, 50], [1, 0, 1]) }} className="absolute bottom-10 text-[10px] font-mono text-slate-400 border border-slate-800 px-2 py-1 bg-black">
+            {card.hint}
+        </motion.div>
     </motion.div>
   );
 };
 
-const AssetSorter: React.FC<AssetSorterProps> = ({ onComplete }) => {
+const AssetSorter: React.FC<AssetSorterProps> = ({ onComplete, updateLife }) => {
   const [index, setIndex] = useState(0);
-  const [score, setScore] = useState(0);
-  const [lastFeedback, setLastFeedback] = useState("");
+  const [combo, setCombo] = useState(0);
+  const [feedback, setFeedback] = useState<{msg: string, color: string} | null>(null);
 
   const handleSwipe = (direction: string) => {
     const card = cardsData[index];
     if (!card) return;
 
-    let correct = direction === card.type;
+    const isCorrect = direction === card.type;
     
-    if (correct) {
-        setScore(s => s + 100);
-        setLastFeedback(`CORRECT: ${direction.toUpperCase()}`);
+    if (isCorrect) {
+        setCombo(c => c + 1);
+        updateLife(1); // +1 year
+        setFeedback({ msg: `${direction.toUpperCase()} CONFIRMED`, color: "text-neon-green" });
     } else {
-        setScore(s => Math.max(0, s - 50));
-        setLastFeedback(`ERROR. IT WAS ${card.type.toUpperCase()}`);
+        setCombo(0);
+        updateLife(-3); // -3 years (Loss Aversion)
+        setFeedback({ msg: "DATA CORRUPTION", color: "text-neon-pink" });
     }
 
     setIndex(prev => prev + 1);
@@ -108,40 +111,41 @@ const AssetSorter: React.FC<AssetSorterProps> = ({ onComplete }) => {
   };
 
   return (
-    <div className="h-screen w-full bg-slate-950 flex items-center justify-center overflow-hidden relative font-mono">
+    <div className="h-screen w-full flex items-center justify-center relative font-mono overflow-hidden">
       
-      {/* THE QUADRANT UI */}
+      {/* Background Matrix UI */}
       <div className="absolute inset-0 pointer-events-none">
-         {/* Axes */}
+         {/* Grid Lines */}
          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-slate-800" />
          <div className="absolute top-1/2 left-0 right-0 h-px bg-slate-800" />
 
-         {/* Labels */}
-         <div className="absolute top-4 left-1/2 -translate-x-1/2 text-xs text-slate-500">ACTIVE</div>
-         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs text-slate-500">PASSIVE</div>
-         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-xs text-slate-500 -rotate-90">NEGATIVE</div>
-         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-500 rotate-90">POSITIVE</div>
+         {/* Quadrant Watermarks */}
+         <div className="absolute top-10 left-10 text-4xl font-display font-black text-slate-900 select-none opacity-50">KILL</div>
+         <div className="absolute top-10 right-10 text-4xl font-display font-black text-slate-900 select-none opacity-50">INVEST</div>
+         <div className="absolute bottom-10 left-10 text-4xl font-display font-black text-slate-900 select-none opacity-50">FRITTER</div>
+         <div className="absolute bottom-10 right-10 text-4xl font-display font-black text-slate-900 select-none opacity-50">WHILE</div>
 
-         {/* Quadrant Names */}
-         <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 text-4xl md:text-6xl font-display font-black text-slate-800 select-none">KILL</div>
-         <div className="absolute top-1/4 right-1/4 translate-x-1/2 -translate-y-1/2 text-4xl md:text-6xl font-display font-black text-slate-800 select-none">INVEST</div>
-         <div className="absolute bottom-1/4 left-1/4 -translate-x-1/2 translate-y-1/2 text-4xl md:text-6xl font-display font-black text-slate-800 select-none">FRITTER</div>
-         <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 text-4xl md:text-6xl font-display font-black text-slate-800 select-none">WHILE</div>
+         {/* Axis Labels */}
+         <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[10px] text-neon-green tracking-widest bg-black px-2 border border-neon-green">ACTIVE</div>
+         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 tracking-widest">PASSIVE</div>
+         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] text-neon-pink tracking-widest -rotate-90">NEGATIVE</div>
+         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-neon-yellow tracking-widest rotate-90">POSITIVE</div>
       </div>
 
-      {/* Header UI */}
-      <div className="absolute top-6 left-6 right-6 flex justify-between z-20">
-         <div>
-            <div className="text-[10px] text-slate-400">PHASE 2</div>
-            <div className="text-xl text-white font-display">ASSET SORTER</div>
-         </div>
-         <div className="text-right">
-             <div className="text-[10px] text-slate-400">CREDITS</div>
-             <div className="text-xl text-neon-green">${score}</div>
-         </div>
+      {/* Combo Meter */}
+      <div className="absolute top-20 right-10 text-right">
+          <div className="text-[10px] text-slate-500">COMBO CHAIN</div>
+          <motion.div 
+            key={combo} 
+            initial={{ scale: 1.5, color: "#fff" }} 
+            animate={{ scale: 1, color: combo > 2 ? "#00ff99" : "#fff" }}
+            className="text-4xl font-display font-black"
+          >
+             x{combo}
+          </motion.div>
       </div>
 
-      {/* Cards Stack */}
+      {/* Card Stack */}
       <div className="relative w-72 h-96 z-10">
          <AnimatePresence>
             {index < cardsData.length ? (
@@ -150,24 +154,22 @@ const AssetSorter: React.FC<AssetSorterProps> = ({ onComplete }) => {
                 ))
             ) : (
                 <motion.div 
-                    initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }}
-                    className="w-full h-full flex items-center justify-center bg-black border-2 border-neon-green rounded-2xl"
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    className="w-full h-full flex flex-col items-center justify-center bg-black/80 border border-neon-green"
                 >
-                    <div className="text-center">
-                        <h2 className="text-2xl font-bold text-white mb-2">VOCAB SYNCED</h2>
-                        <p className="text-neon-green text-xs">UPLOADING DATA...</p>
-                    </div>
+                    <h2 className="text-xl font-bold text-white mb-2">MATRIX ALIGNED</h2>
+                    <div className="w-8 h-8 border-2 border-t-neon-green border-r-transparent border-b-neon-green border-l-transparent rounded-full animate-spin"></div>
                 </motion.div>
             )}
          </AnimatePresence>
       </div>
 
-      {/* Feedback Overlay */}
-      <div className="absolute bottom-10 left-0 w-full text-center h-8">
-          <span key={index} className="text-neon-green font-bold tracking-widest animate-pulse">
-              {lastFeedback}
-          </span>
-      </div>
+      {/* Feedback text */}
+      {feedback && (
+          <div className={`absolute bottom-20 font-display text-xl font-bold tracking-widest ${feedback.color} animate-pulse`}>
+              {feedback.msg}
+          </div>
+      )}
 
     </div>
   );
