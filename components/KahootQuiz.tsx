@@ -11,6 +11,8 @@ type Question = {
   q: string;
   options: string[];
   correct: number;
+  qRu?: string;
+  qUz?: string;
 };
 
 const topics: { id: string; title: string; icon: string; theme: string }[] = [
@@ -28,21 +30,21 @@ const topics: { id: string; title: string; icon: string; theme: string }[] = [
 
 const questionData: Record<string, Question[]> = {
   money: [
-    { q: "By the time I retire, I _____ over two million dollars.", options: ["will be saving", "will have saved", "will save", "am saving"], correct: 1 },
-    { q: "Don't call him; he _____ his stock portfolio right now.", options: ["will review", "will have reviewed", "will be reviewing", "reviews"], correct: 2 },
-    { q: "If we continue this spending rate, we _____ of funds by Tuesday.", options: ["will have run out", "will be running out", "run out", "ran out"], correct: 0 },
-    { q: "By next year, she _____ as a broker for a decade.", options: ["will work", "will be working", "will have been working", "is going to work"], correct: 2 },
-    { q: "Stop _____ your inheritance on digital skins!", options: ["investing", "frittering away", "setting aside", "getting worth"], correct: 1 },
-    { q: "I _____ some money aside every month for a new rig.", options: ["will be setting", "will have set", "set", "am set"], correct: 0 },
-    { q: "By the time the market crashes, he _____ all his assets.", options: ["will sell", "will be selling", "will have sold", "sells"], correct: 2 },
-    { q: "Buying that NFT was a total _____ of Ethereum.", options: ["kill", "waste", "fritter", "short"], correct: 1 },
-    { q: "Unless you _____ the right strategy, you'll lose everything.", options: ["choose", "will choose", "will have chosen", "are choosing"], correct: 0 },
-    { q: "He always _____ his wealth around to impress people.", options: ["throws", "will throw", "will be throwing", "will have thrown"], correct: 0 },
-    { q: "By 2030, physical cash _____ obsolete.", options: ["will become", "will have become", "will be becoming", "becomes"], correct: 1 },
-    { q: "I _____ the bill when the waiter comes.", options: ["will be paying", "will have paid", "am paying", "will pay"], correct: 3 },
-    { q: "Do you have any liquidity _____ for an emergency?", options: ["to spare", "to kill", "to waste", "to fritter"], correct: 0 },
-    { q: "By Friday, I _____ off my entire student loan.", options: ["will pay", "will be paying", "will have paid", "pay"], correct: 2 },
-    { q: "She _____ a fortune by the time she's thirty.", options: ["will be amassing", "will have amassed", "amasses", "will amass"], correct: 1 },
+    { q: "By the time I retire, I _____ over two million dollars.", options: ["will be saving", "will have saved", "will save", "am saving"], correct: 1, qRu: "К моменту выхода на пенсию я сэкономлю более двух миллионов долларов.", qUz: "Nafaqaga chiqgunimcha men ikki million dollardan ortiq mablag' to'plagan bo'laman." },
+    { q: "Don't call him; he _____ his stock portfolio right now.", options: ["will review", "will have reviewed", "will be reviewing", "reviews"], correct: 2, qRu: "Не звони ему; он сейчас просматривает свой портфель акций.", qUz: "Unga qo'ng'iroq qilmang; u hozir aksiya portfelini ko'rib chiqayotgan bo'ladi." },
+    { q: "If we continue this spending rate, we _____ of funds by Tuesday.", options: ["will have run out", "will be running out", "run out", "ran out"], correct: 0, qRu: "Если мы продолжим тратить такими темпами, к вторнику у нас закончатся средства.", qUz: "Agar biz shu sur'atda sarflashda davom etsak, seshanbagacha mablag'imiz tugab qoladi." },
+    { q: "By next year, she _____ as a broker for a decade.", options: ["will work", "will be working", "will have been working", "is going to work"], correct: 2, qRu: "К следующему году она проработает брокером уже десять лет.", qUz: "Kelasi yilga kelib, u broker bo'lib ishlayotganiga o'n yil to'ladi." },
+    { q: "Stop _____ your inheritance on digital skins!", options: ["investing", "frittering away", "setting aside", "getting worth"], correct: 1, qRu: "Перестань растрачивать наследство на цифровые скины!", qUz: "Merosxo'rligingizni raqamli skinlarga behuda sarflashni bas qiling!" },
+    { q: "I _____ some money aside every month for a new rig.", options: ["will be setting", "will have set", "set", "am set"], correct: 0, qRu: "Я буду откладывать деньги каждый месяц на новое оборудование.", qUz: "Men har oy yangi uskuna uchun pul olib qo'yaman." },
+    { q: "By the time the market crashes, he _____ all his assets.", options: ["will sell", "will be selling", "will have sold", "sells"], correct: 2, qRu: "К моменту краха рынка он уже продаст все свои активы.", qUz: "Bozor qulaguniga qadar u barcha aktivlarini sotib bo'lgan bo'ladi." },
+    { q: "Buying that NFT was a total _____ of Ethereum.", options: ["kill", "waste", "fritter", "short"], correct: 1, qRu: "Покупка этого NFT была пустой тратой Ethereum.", qUz: "Ushbu NFTni sotib olish Ethereum-ni behuda sarflash edi." },
+    { q: "Unless you _____ the right strategy, you'll lose everything.", options: ["choose", "will choose", "will have chosen", "are choosing"], correct: 0, qRu: "Если ты не выберешь правильную стратегию, ты потеряешь все.", qUz: "Agar to'g'ri strategiyani tanlamasangiz, hammasini yo'qotasiz." },
+    { q: "He always _____ his wealth around to impress people.", options: ["throws", "will throw", "will be throwing", "will have thrown"], correct: 0, qRu: "Он всегда сорит своим богатством, чтобы впечатлить людей.", qUz: "U odamlarni hayratda qoldirish uchun har doim boyligini sochib yuradi." },
+    { q: "By 2030, physical cash _____ obsolete.", options: ["will become", "will have become", "will be becoming", "becomes"], correct: 1, qRu: "К 2030 году наличные деньги устареют.", qUz: "2030 yilga kelib naqd pul eskirgan bo'ladi." },
+    { q: "I _____ the bill when the waiter comes.", options: ["will be paying", "will have paid", "am paying", "will pay"], correct: 3, qRu: "Я оплачу счет, когда придет официант.", qUz: "Ofitsiant kelganda hisobni men to'layman." },
+    { q: "Do you have any liquidity _____ for an emergency?", options: ["to spare", "to kill", "to waste", "to fritter"], correct: 0, qRu: "У тебя есть свободные средства на случай чрезвычайной ситуации?", qUz: "Favqulodda vaziyat uchun ortiqcha mablag'ingiz bormi?" },
+    { q: "By Friday, I _____ off my entire student loan.", options: ["will pay", "will be paying", "will have paid", "pay"], correct: 2, qRu: "К пятнице я полностью выплачу свой студенческий кредит.", qUz: "Juma kuniga qadar men talabalik kreditimni to'liq to'lab bo'laman." },
+    { q: "She _____ a fortune by the time she's thirty.", options: ["will be amassing", "will have amassed", "amasses", "will amass"], correct: 1, qRu: "К тридцати годам она сколотит состояние.", qUz: "O'ttiz yoshga to'lguniga qadar u boylik orttirgan bo'ladi." },
   ],
   time: [
     { q: "By noon, we _____ for the bus for three hours.", options: ["will wait", "will be waiting", "will have been waiting", "have waited"], correct: 2 },
@@ -101,16 +103,11 @@ const questionData: Record<string, Question[]> = {
     { q: "By next year, she _____ another Grammy.", options: ["will win", "will be winning", "will have won", "wins"], correct: 2 },
     { q: "Fans _____ in line for hours by the time doors open.", options: ["will wait", "will be waiting", "will have been waiting", "wait"], correct: 2 },
     { q: "She _____ her hair green again soon.", options: ["will be dyeing", "will have dyed", "dyes", "dyed"], correct: 0 },
-    { q: "Buying that VIP ticket was _____ money.", options: ["getting worth", "frittering away", "investing", "running out"], correct: 0 }, // Wait, context implies worth it? No, "was getting worth" is grammatically weird. Let's assume negative or positive context. Actually "getting your money's worth" is the phrase.
-    // Correction: "Buying that VIP ticket was definitely getting my money's worth." 
-    // Let's change the Q to be clearer.
     { q: "I really _____ from that concert ticket.", options: ["got my money's worth", "frittered away", "wasted", "killed time"], correct: 0 },
     { q: "By the time she's 30, she _____ a legend.", options: ["will become", "will be becoming", "will have become", "becomes"], correct: 2 },
     { q: "She _____ on a world tour next summer.", options: ["will go", "will be going", "will have gone", "goes"], correct: 1 },
-    { q: "By the finale, the crowd _____ every lyric.", options: ["will sing", "will be singing", "will have sung", "sings"], correct: 2 }, // Actually "will have sung" means finished. "Will be singing" implies during. "Will have sung" implies by end. "By the finale" -> context usually implies "will have memorized" or "will be singing along". Let's stick to "will have memorized" logic or "will have sung". Let's change verb to "memorize".
     { q: "By the show, I _____ every word.", options: ["will memorize", "will be memorizing", "will have memorized", "memorize"], correct: 2 },
     { q: "Don't _____ your chance to see her live.", options: ["waste", "invest", "set aside", "spend"], correct: 0 },
-    { q: "She _____ songs for the new movie right now.", options: ["will write", "will be writing", "will have written", "writes"], correct: 1 }, // "Right now" usually implies Present Continuous, but in future context "Right now next week". Let's say "This time next week, she..."
     { q: "This time next week, she _____ songs for Bond.", options: ["will write", "will be writing", "will have written", "writes"], correct: 1 },
     { q: "By 2030, her style _____ completely.", options: ["will change", "will be changing", "will have changed", "changes"], correct: 2 },
     { q: "She _____ on stage for 2 hours by the time we arrive.", options: ["will be", "will have been", "is", "was"], correct: 1 },
@@ -129,18 +126,16 @@ const questionData: Record<string, Question[]> = {
     { q: "I _____ the map while you heal.", options: ["will explore", "will be exploring", "will have explored", "explore"], correct: 1 },
     { q: "By the end of the event, I _____ all rewards.", options: ["will claim", "will be claiming", "will have claimed", "claim"], correct: 2 },
     { q: "Don't _____ your ammo on minions.", options: ["waste", "invest", "spare", "make"], correct: 0 },
-    { q: "We _____ the enemy base in 5 minutes.", options: ["will attack", "will be attacking", "will have attacked", "attack"], correct: 1 }, // "In 5 mins" -> "will be attacking" (start/duration) or "will attack" (schedule). "Will be attacking" is good for process.
+    { q: "We _____ the enemy base in 5 minutes.", options: ["will attack", "will be attacking", "will have attacked", "attack"], correct: 1 }, 
     { q: "By 2026, VR gaming _____ mainstream.", options: ["will become", "will have become", "will be becoming", "becomes"], correct: 1 },
   ],
   future: [
-    { q: "By 2040, I _____ my own company.", options: ["will run", "will be running", "will have run", "run"], correct: 2 }, // Could be "will be running" (process) or "will have run" (completion of starting?). "Will be running" is better for "I'm CEO". But "By 2040" often triggers Perfect. Let's use "will have started".
-    // Correction: "By 2040, I _____ my own company." -> "will have started" (perfect) or "will be running" (continuous). If context is duration/state at that time, continuous is good. If achievement, perfect. Let's swap options to make it clear.
     { q: "By 2040, I _____ my own company for ten years.", options: ["will run", "will be running", "will have been running", "run"], correct: 2 },
     { q: "This time next year, I _____ in Tokyo.", options: ["will live", "will have lived", "will be living", "live"], correct: 2 },
     { q: "I _____ strictly vegan next month.", options: ["will eat", "will have eaten", "will be eating", "eat"], correct: 2 },
     { q: "By graduation, she _____ her degree.", options: ["will finish", "will be finishing", "will have finished", "finishes"], correct: 2 },
     { q: "Don't _____ your potential on bad habits.", options: ["invest", "fritter away", "set aside", "choose"], correct: 1 },
-    { q: "I _____ English fluently by then.", options: ["will speak", "will have spoken", "will be speaking", "speak"], correct: 2 }, // "Will be speaking" implies ability/process.
+    { q: "I _____ English fluently by then.", options: ["will speak", "will have spoken", "will be speaking", "speak"], correct: 2 }, 
     { q: "You must _____ the right career path.", options: ["choose", "waste", "kill", "run"], correct: 0 },
     { q: "By the time we arrive, the meeting _____.", options: ["will end", "will be ending", "will have ended", "ends"], correct: 2 },
     { q: "We _____ robots in our homes soon.", options: ["will use", "will have used", "will be using", "use"], correct: 2 },
@@ -157,14 +152,14 @@ const questionData: Record<string, Question[]> = {
     { q: "By the finale, Hawkins _____ completely.", options: ["will fall", "will be falling", "will have fallen", "falls"], correct: 2 },
     { q: "Mike _____ to contact Eleven all night.", options: ["will try", "will be trying", "will have tried", "tries"], correct: 1 },
     { q: "They _____ for days by the time help arrives.", options: ["will fight", "will be fighting", "will have been fighting", "fight"], correct: 2 },
-    { q: "Max _____ up that hill.", options: ["will run", "will have run", "will be running", "runs"], correct: 2 }, // "Will be running" - iconic scene re-enactment prediction
+    { q: "Max _____ up that hill.", options: ["will run", "will have run", "will be running", "runs"], correct: 2 }, 
     { q: "Hopper _____ by the time Joyce arrives.", options: ["will escape", "will be escaping", "will have escaped", "escapes"], correct: 2 },
     { q: "Don't _____ your ammo on the demobats!", options: ["waste", "invest", "set aside", "make"], correct: 0 },
     { q: "By dawn, the gate _____.", options: ["will open", "will be opening", "will have opened", "opens"], correct: 2 },
     { q: "Dustin _____ code red on the radio.", options: ["will scream", "will be screaming", "will have screamed", "screams"], correct: 1 },
-    { q: "We _____ of time to save Will.", options: ["will run out", "will have run out", "will be running out", "run out"], correct: 2 }, // "Will be running out" implies process getting critical.
+    { q: "We _____ of time to save Will.", options: ["will run out", "will have run out", "will be running out", "run out"], correct: 2 }, 
     { q: "Lucas _____ the basketball game tonight.", options: ["will play", "will have played", "will be playing", "plays"], correct: 2 },
-    { q: "In the Upside Down, time _____ differently.", options: ["will move", "will have moved", "will be moving", "moves"], correct: 2 }, // "Will be moving" or "moves". Future prediction: "You'll see, time will be moving differently."
+    { q: "In the Upside Down, time _____ differently.", options: ["will move", "will have moved", "will be moving", "moves"], correct: 2 }, 
     { q: "By the end, they _____ the Mind Flayer.", options: ["will destroy", "will have destroyed", "will be destroying", "destroy"], correct: 1 },
     { q: "Nancy _____ the truth by morning.", options: ["will discover", "will have discovered", "will be discovering", "discovers"], correct: 1 },
   ],
@@ -174,7 +169,7 @@ const questionData: Record<string, Question[]> = {
     { q: "Don't _____ your galleons on Zonko's products.", options: ["fritter away", "invest", "set aside", "save"], correct: 0 },
     { q: "Ron _____ of spells if he panics.", options: ["will run out", "will have run out", "will be running out", "runs out"], correct: 0 },
     { q: "By the end of the year, Gryffindor _____ the cup.", options: ["will win", "will be winning", "will have won", "wins"], correct: 2 },
-    { q: "Malfoy _____ his money around to impress people.", options: ["will throw", "will be throwing", "will have thrown", "throws"], correct: 1 }, // "Will be throwing" - prediction of behaviour.
+    { q: "Malfoy _____ his money around to impress people.", options: ["will throw", "will be throwing", "will have thrown", "throws"], correct: 1 }, 
     { q: "Dumbledore _____ time for Harry's lessons.", options: ["will set aside", "will be setting aside", "will have set aside", "sets aside"], correct: 0 },
     { q: "Hagrid _____ the dragons when we arrive.", options: ["will feed", "will have fed", "will be feeding", "feeds"], correct: 2 },
     { q: "By year 7, they _____ up.", options: ["will grow", "will be growing", "will have grown", "grow"], correct: 2 },
@@ -204,6 +199,43 @@ const questionData: Record<string, Question[]> = {
   ],
 };
 
+// --- TRANSLATION HELPER ---
+const TranslationControl = ({ ru, uz }: { ru?: string, uz?: string }) => {
+    const [lang, setLang] = useState<'ru' | 'uz' | null>(null);
+    if (!ru && !uz) return null;
+
+    return (
+        <div className="flex flex-col items-center gap-2 mt-4 z-20 relative">
+            <div className="flex gap-2">
+                <button 
+                    onClick={(e) => { e.stopPropagation(); setLang(lang === 'ru' ? null : 'ru'); }} 
+                    disabled={!ru}
+                    className={`text-xs font-bold px-2 py-1 rounded border ${lang === 'ru' ? 'bg-magic-gold text-obsidian border-magic-gold' : 'border-ink/30 dark:border-parchment/30 text-ink/50 dark:text-parchment/50'} ${!ru ? 'opacity-30 cursor-not-allowed' : ''}`}
+                >
+                    RU
+                </button>
+                <button 
+                    onClick={(e) => { e.stopPropagation(); setLang(lang === 'uz' ? null : 'uz'); }} 
+                    disabled={!uz}
+                    className={`text-xs font-bold px-2 py-1 rounded border ${lang === 'uz' ? 'bg-emerald-rune text-obsidian border-emerald-rune' : 'border-ink/30 dark:border-parchment/30 text-ink/50 dark:text-parchment/50'} ${!uz ? 'opacity-30 cursor-not-allowed' : ''}`}
+                >
+                    UZ
+                </button>
+            </div>
+            <AnimatePresence>
+                {lang && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
+                        className="text-sm font-body italic text-ink dark:text-parchment bg-parchment/80 dark:bg-obsidian/80 px-3 py-1 rounded shadow-sm"
+                    >
+                        {lang === 'ru' ? ru : uz}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
+
 const KahootQuiz: React.FC<KahootProps> = ({ onComplete, updateLife }) => {
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
   const [qIndex, setQIndex] = useState(0);
@@ -215,7 +247,6 @@ const KahootQuiz: React.FC<KahootProps> = ({ onComplete, updateLife }) => {
   
   const timerRef = useRef<any>(null);
 
-  // Timer Logic
   useEffect(() => {
     if (gameState === 'question') {
       setTimer(15);
@@ -264,7 +295,6 @@ const KahootQuiz: React.FC<KahootProps> = ({ onComplete, updateLife }) => {
     setGameState('feedback');
 
     setTimeout(() => {
-       // Check if user exited during feedback
        if (gameState === 'topic-select') return;
 
        if (qIndex + 1 < questionData[activeTopic].length) {
@@ -285,8 +315,6 @@ const KahootQuiz: React.FC<KahootProps> = ({ onComplete, updateLife }) => {
     setGameState('topic-select');
     setScore(0);
   };
-
-  // --- RENDERERS ---
 
   const renderTopicSelect = () => (
     <div className="w-full max-w-6xl mx-auto p-4 flex flex-col items-center">
@@ -324,7 +352,6 @@ const KahootQuiz: React.FC<KahootProps> = ({ onComplete, updateLife }) => {
 
     return (
       <div className="flex flex-col h-full w-full max-w-5xl mx-auto p-4 relative">
-        {/* Exit Button */}
         <button 
             onClick={returnToMenu}
             className="absolute top-4 left-4 z-50 bg-white/20 hover:bg-red-500 hover:text-white p-3 rounded-full backdrop-blur-sm transition-all shadow-lg"
@@ -333,7 +360,6 @@ const KahootQuiz: React.FC<KahootProps> = ({ onComplete, updateLife }) => {
             <span className="text-2xl">🚪</span>
         </button>
 
-        {/* Header: Score & Timer */}
         <div className="flex justify-between items-center mb-6 pl-16">
            <div className="bg-black/20 dark:bg-white/10 px-6 py-2 rounded-full font-bold text-xl text-ink dark:text-parchment">
               Score: {score}
@@ -343,10 +369,9 @@ const KahootQuiz: React.FC<KahootProps> = ({ onComplete, updateLife }) => {
            </div>
         </div>
 
-        {/* Question Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-8 mb-8 flex items-center justify-center min-h-[30vh] text-center border-b-8 border-gray-300 dark:border-gray-900 relative">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-8 mb-8 flex flex-col items-center justify-center min-h-[30vh] text-center border-b-8 border-gray-300 dark:border-gray-900 relative">
            <div className="absolute top-2 right-2 text-xs font-bold text-gray-400">Q {qIndex + 1}/{totalQuestions}</div>
-           <h2 className="text-2xl md:text-4xl font-bold text-gray-800 dark:text-white leading-snug">
+           <h2 className="text-2xl md:text-4xl font-bold text-gray-800 dark:text-white leading-snug mb-4">
               {currentQ.q.includes("_____") ? (
                   currentQ.q.split("_____").map((part, i) => (
                       <React.Fragment key={i}>
@@ -356,9 +381,9 @@ const KahootQuiz: React.FC<KahootProps> = ({ onComplete, updateLife }) => {
                   ))
               ) : currentQ.q}
            </h2>
+           <TranslationControl ru={currentQ.qRu} uz={currentQ.qUz} />
         </div>
 
-        {/* Options Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
            {currentQ.options.map((opt, i) => {
              const colors = [
@@ -382,7 +407,6 @@ const KahootQuiz: React.FC<KahootProps> = ({ onComplete, updateLife }) => {
            })}
         </div>
         
-        {/* Progress Bar */}
         <div className="absolute bottom-0 left-0 w-full h-2 bg-gray-300">
            <motion.div 
              className={themeColor}
@@ -400,7 +424,6 @@ const KahootQuiz: React.FC<KahootProps> = ({ onComplete, updateLife }) => {
     const currentQ = questionData[activeTopic][qIndex];
     return (
         <div className={`w-full h-full flex flex-col items-center justify-center ${feedback === 'correct' ? 'bg-green-500' : 'bg-red-500'} relative`}>
-            {/* Exit Button in Feedback too */}
             <button 
                 onClick={returnToMenu}
                 className="absolute top-4 left-4 z-50 bg-white/20 hover:bg-white hover:text-black p-3 rounded-full backdrop-blur-sm transition-all shadow-lg"
@@ -413,7 +436,7 @@ const KahootQuiz: React.FC<KahootProps> = ({ onComplete, updateLife }) => {
                 {feedback === 'correct' ? "CORRECT" : "INCORRECT"}
             </h1>
             <div className="text-3xl text-white font-bold bg-black/20 px-8 py-4 rounded-lg">
-               + {feedback === 'correct' ? score - (score % 100) /* Rough logic for display */ : 0} pts
+               + {feedback === 'correct' ? score - (score % 100) : 0} pts
             </div>
             {feedback === 'wrong' && (
                 <div className="mt-8 bg-white/90 p-6 rounded-lg text-center">

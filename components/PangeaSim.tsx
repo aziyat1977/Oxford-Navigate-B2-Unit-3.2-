@@ -10,6 +10,8 @@ const steps = [
   {
     id: 1,
     context: "VISION: The floating isles are drifting apart. The process is ongoing.",
+    ruContext: "ВИДЕНИЕ: Парящие острова дрейфуют друг от друга. Процесс продолжается.",
+    uzContext: "KO'RISH: Suzib yuruvchi orollar bir-biridan uzoqlashmoqda. Jarayon davom etmoqda.",
     prompt: "In the coming age, the isles ____________ (drift) further.",
     answer: "will be drifting",
     hint: "Use Future Continuous for a process in flow.",
@@ -17,11 +19,46 @@ const steps = [
   {
     id: 2,
     context: "PROPHECY: The convergence happens before the eclipse. It is finished by then.",
+    ruContext: "ПРОРОЧЕСТВО: Сближение произойдет до затмения. К тому времени оно завершится.",
+    uzContext: "BASHORAT: Yaqinlashish tutilishdan oldin sodir bo'ladi. O'sha vaqtgacha u tugaydi.",
     prompt: "By the eclipse, the realms ____________ (unite) once more.",
     answer: "will have united",
     hint: "Use Future Perfect for a completed fate.",
   }
 ];
+
+// --- TRANSLATION HELPER ---
+const TranslationControl = ({ ru, uz }: { ru: string, uz: string }) => {
+    const [lang, setLang] = useState<'ru' | 'uz' | null>(null);
+    return (
+        <div className="flex flex-col items-start gap-2 mt-2 mb-4 relative">
+            <div className="flex gap-2">
+                <button 
+                    onClick={(e) => { e.stopPropagation(); setLang(lang === 'ru' ? null : 'ru'); }} 
+                    className={`text-xs font-bold px-2 py-1 rounded border ${lang === 'ru' ? 'bg-magic-gold text-obsidian border-magic-gold' : 'border-ink/30 dark:border-parchment/30 text-ink/50 dark:text-parchment/50'}`}
+                >
+                    RU
+                </button>
+                <button 
+                    onClick={(e) => { e.stopPropagation(); setLang(lang === 'uz' ? null : 'uz'); }} 
+                    className={`text-xs font-bold px-2 py-1 rounded border ${lang === 'uz' ? 'bg-emerald-rune text-obsidian border-emerald-rune' : 'border-ink/30 dark:border-parchment/30 text-ink/50 dark:text-parchment/50'}`}
+                >
+                    UZ
+                </button>
+            </div>
+            <AnimatePresence>
+                {lang && (
+                    <motion.div 
+                        initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                        className="text-sm font-body italic text-ink dark:text-parchment bg-black/10 dark:bg-white/10 px-3 py-1 rounded"
+                    >
+                        {lang === 'ru' ? ru : uz}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
 
 const PangeaSim: React.FC<PangeaProps> = ({ onComplete }) => {
   const [stepIndex, setStepIndex] = useState(0);
@@ -55,10 +92,7 @@ const PangeaSim: React.FC<PangeaProps> = ({ onComplete }) => {
   return (
     <div className="h-full w-full bg-parchment dark:bg-obsidian flex flex-col items-center justify-center relative overflow-hidden bg-paper-texture dark:bg-leather-texture transition-colors">
       
-      {/* 3D Realm Visual (Abstract Representation) */}
       <div className="relative w-72 h-72 md:w-96 md:h-96 mb-12 flex items-center justify-center">
-        
-        {/* Magic Circle Background */}
         <div className={`absolute inset-0 rounded-full border-4 border-double border-ink/20 dark:border-magic-gold/20 ${status === 'error' ? 'animate-pulse border-crimson' : 'animate-[spin_60s_linear_infinite]'}`}>
             <svg viewBox="0 0 100 100" className="opacity-30">
                 <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeDasharray="5,5" />
@@ -66,36 +100,32 @@ const PangeaSim: React.FC<PangeaProps> = ({ onComplete }) => {
             </svg>
         </div>
 
-        {/* Floating Isles Logic */}
-        {/* Isle 1 */}
         <motion.div 
             className="absolute w-24 h-24 bg-mystic-blue/40 rounded-full blur-md flex items-center justify-center"
             initial={{ x: -40, y: -40 }}
             animate={
                 stepIndex === 0 
-                ? { x: [-40, -60, -40], y: [-40, -20, -40] } // Drifting
-                : { x: 0, y: 0 } // Uniting
+                ? { x: [-40, -60, -40], y: [-40, -20, -40] } 
+                : { x: 0, y: 0 } 
             }
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         >
              <span className="text-2xl opacity-50">🏝️</span>
         </motion.div>
         
-        {/* Isle 2 */}
         <motion.div 
             className="absolute w-32 h-32 bg-emerald-rune/40 rounded-full blur-md flex items-center justify-center"
             initial={{ x: 40, y: 40 }}
             animate={
                 stepIndex === 0 
-                ? { x: [40, 60, 40], y: [40, 20, 40] } // Drifting
-                : { x: 0, y: 0 } // Uniting
+                ? { x: [40, 60, 40], y: [40, 20, 40] } 
+                : { x: 0, y: 0 } 
             }
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
         >
              <span className="text-3xl opacity-50">🏔️</span>
         </motion.div>
 
-        {/* Success Burst */}
         <AnimatePresence>
             {status === 'success' && (
                 <motion.div 
@@ -108,14 +138,14 @@ const PangeaSim: React.FC<PangeaProps> = ({ onComplete }) => {
         </AnimatePresence>
       </div>
 
-      {/* Spell Interface */}
       <div className="z-10 bg-parchment/90 dark:bg-obsidian/90 p-8 rounded-lg border-[6px] border-double border-ink dark:border-magic-gold backdrop-blur-sm max-w-xl w-full shadow-2xl mx-4">
         <div className="flex justify-between items-center mb-6 border-b border-ink/20 dark:border-magic-gold/20 pb-2">
             <h2 className="text-crimson dark:text-mystic-blue font-display font-bold">REALM CONVERGENCE</h2>
             <span className="font-rune text-ink dark:text-parchment">Phase {stepIndex + 1}/{steps.length}</span>
         </div>
         
-        <p className="text-ink/60 dark:text-parchment/60 font-body italic mb-4 text-sm">{currentStep.context}</p>
+        <p className="text-ink/60 dark:text-parchment/60 font-body italic mb-1 text-sm">{currentStep.context}</p>
+        <TranslationControl ru={currentStep.ruContext} uz={currentStep.uzContext} />
         
         <p className="text-ink dark:text-parchment text-xl md:text-2xl mb-8 font-display leading-relaxed">
              {currentStep.prompt.split("____________").map((part, i) => (
@@ -144,7 +174,6 @@ const PangeaSim: React.FC<PangeaProps> = ({ onComplete }) => {
                 CAST
             </button>
             
-            {/* Success Particles */}
             {status === 'success' && (
                  <motion.div initial={{ y: 0, opacity: 1 }} animate={{ y: -50, opacity: 0 }} className="absolute right-0 -top-10 text-magic-gold font-bold">
                      ✨ CAST SUCCESSFUL

@@ -16,54 +16,107 @@ const diagnosticQuestions = [
   { 
     q: "Do not disturb me. I _____ the stars.", 
     options: ["will be watching", "will have watched", "am watching", "will watch"], 
-    answer: "will be watching" 
+    answer: "will be watching",
+    ru: "Не беспокой меня. Я буду наблюдать за звездами.",
+    uz: "Menga xalaqit bermang. Men yulduzlarni kuzatayotgan bo'laman."
   },
   { 
     q: "By arrival, the potion _____.", 
     options: ["will have brewed", "will be brewing", "brews", "has brewed"], 
-    answer: "will have brewed" 
+    answer: "will have brewed",
+    ru: "К моменту прибытия зелье уже сварится.",
+    uz: "Kelguniga qadar, damlama tayyor bo'ladi."
   },
   { 
     q: "Next century, I _____ in the High Tower.", 
     options: ["will be living", "will have lived", "live", "am living"], 
-    answer: "will be living" 
+    answer: "will be living",
+    ru: "В следующем столетии я буду жить в Высокой Башне.",
+    uz: "Keyingi asrda men Yuqori minorada yashayotgan bo'laman."
   },
   { 
     q: "I _____ tomorrow, so let us duel.", 
     options: ["won't be practicing", "won't have practiced", "don't practice", "not practicing"], 
-    answer: "won't be practicing" 
+    answer: "won't be practicing",
+    ru: "Я не буду тренироваться завтра, так что давай сразимся.",
+    uz: "Men ertaga mashq qilmayman, keling, duel qilamiz."
   },
   { 
     q: "By midnight, I _____ all the mana.", 
     options: ["will have drained", "will be draining", "drain", "am draining"], 
-    answer: "will have drained" 
+    answer: "will have drained",
+    ru: "К полуночи я исчерпаю всю ману.",
+    uz: "Yarim tungacha men barcha manani sarflab bo'laman."
   },
   {
     q: "In ten years, the Guild _____ a leader.",
     options: ["will have chosen", "will be choosing", "chose", "is choosing"],
-    answer: "will have chosen"
+    answer: "will have chosen",
+    ru: "Через десять лет Гильдия уже выберет лидера.",
+    uz: "O'n yildan so'ng, Gildiya liderni tanlab bo'lgan bo'ladi."
   },
   {
     q: "Don't enter. She _____ a ritual.",
     options: ["will be performing", "will have performed", "performs", "performed"],
-    answer: "will be performing"
+    answer: "will be performing",
+    ru: "Не входи. Она будет проводить ритуал.",
+    uz: "Kirmang. U marosim o'tkazayotgan bo'ladi."
   },
   {
     q: "By 2040, nature _____ the ruins.",
     options: ["will have reclaimed", "will be reclaiming", "reclaims", "is reclaiming"],
-    answer: "will have reclaimed"
+    answer: "will have reclaimed",
+    ru: "К 2040 году природа вновь завладеет руинами.",
+    uz: "2040 yilga kelib, tabiat vayronalarni qaytarib olgan bo'ladi."
   },
   {
     q: "Look at the time. We _____ late.",
     options: ["will be", "will have been", "are being", "have been"],
-    answer: "will be"
+    answer: "will be",
+    ru: "Посмотри на время. Мы опоздаем.",
+    uz: "Vaqtga qara. Biz kech qolamiz."
   },
   {
     q: "At noon, the army _____ the bridge.",
     options: ["will be crossing", "will have crossed", "crosses", "is crossing"],
-    answer: "will be crossing"
+    answer: "will be crossing",
+    ru: "В полдень армия будет переходить мост.",
+    uz: "Tushda armiya ko'prikdan o'tayotgan bo'ladi."
   }
 ];
+
+// --- TRANSLATION HELPER ---
+const TranslationControl = ({ ru, uz }: { ru: string, uz: string }) => {
+    const [lang, setLang] = useState<'ru' | 'uz' | null>(null);
+    return (
+        <div className="flex flex-col items-center gap-2 mt-4 z-20 relative">
+            <div className="flex gap-2">
+                <button 
+                    onClick={(e) => { e.stopPropagation(); setLang(lang === 'ru' ? null : 'ru'); }} 
+                    className={`text-xs font-bold px-2 py-1 rounded border ${lang === 'ru' ? 'bg-magic-gold text-obsidian border-magic-gold' : 'border-ink/30 dark:border-parchment/30 text-ink/50 dark:text-parchment/50'}`}
+                >
+                    RU
+                </button>
+                <button 
+                    onClick={(e) => { e.stopPropagation(); setLang(lang === 'uz' ? null : 'uz'); }} 
+                    className={`text-xs font-bold px-2 py-1 rounded border ${lang === 'uz' ? 'bg-emerald-rune text-obsidian border-emerald-rune' : 'border-ink/30 dark:border-parchment/30 text-ink/50 dark:text-parchment/50'}`}
+                >
+                    UZ
+                </button>
+            </div>
+            <AnimatePresence>
+                {lang && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
+                        className="text-sm font-body italic text-ink dark:text-parchment bg-parchment/80 dark:bg-obsidian/80 px-3 py-1 rounded shadow-sm"
+                    >
+                        {lang === 'ru' ? ru : uz}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
 
 const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
   const [phase, setPhase] = useState<'intro' | 'ritual' | 'diagnostic'>('intro');
@@ -76,7 +129,6 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
 
   const requestRef = useRef<number>();
 
-  // Shuffle options on question change
   useEffect(() => {
     if (qIndex < diagnosticQuestions.length) {
       setCurrentOptions(shuffle(diagnosticQuestions[qIndex].options));
@@ -86,7 +138,6 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
   const startHolding = () => { initAudio(); setIsHolding(true); };
   const stopHolding = () => setIsHolding(false);
 
-  // Progress Bar Logic
   const updateProgress = () => {
     if (isHolding) {
       setProgress((prev) => {
@@ -137,7 +188,6 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
     }, 600);
   };
 
-  // --- PAGE 1: THE GATE (INTRO) ---
   const renderIntro = () => (
     <motion.div 
       key="intro" 
@@ -163,7 +213,6 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
     </motion.div>
   );
 
-  // --- PAGE 2: THE RITUAL (LOGIN) ---
   const renderRitual = () => (
     <motion.div 
       key="ritual"
@@ -180,7 +229,6 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
         onTouchStart={(e) => { e.preventDefault(); startHolding(); }}
         onTouchEnd={(e) => { e.preventDefault(); stopHolding(); }}
       >
-          {/* The Orb */}
           <motion.div 
             className="w-64 h-64 md:w-80 md:h-80 rounded-full bg-gradient-to-br from-blue-400 to-indigo-900 dark:from-purple-900 dark:to-black shadow-[0_0_50px_rgba(75,0,130,0.5)] border-8 border-magic-gold/30 flex items-center justify-center relative overflow-hidden active:scale-95 transition-transform"
             animate={isHolding ? { scale: 1.05, boxShadow: "0 0 100px #4b9cd3" } : { scale: 1 }}
@@ -191,7 +239,6 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
             </motion.div>
           </motion.div>
           
-          {/* Progress Ring */}
           <svg className="absolute -top-10 -left-10 w-[21rem] h-[21rem] md:w-[26rem] md:h-[26rem] pointer-events-none -rotate-90" viewBox="0 0 100 100">
             <motion.circle 
                 cx="50" cy="50" r="46"
@@ -210,7 +257,6 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
     </motion.div>
   );
 
-  // --- PAGE 3: THE TRIAL (DIAGNOSTIC) ---
   const renderDiagnostic = () => (
     <motion.div
       key="diagnostic"
@@ -220,7 +266,6 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
         ${feedbackState === 'incorrect' ? 'bg-crimson/10' : ''}
       `}
     >
-        {/* Header */}
         <div className="flex justify-between items-center mb-8 border-b-4 border-ink dark:border-magic-gold pb-4">
             <span className="text-2xl md:text-3xl font-display font-bold text-crimson dark:text-mystic-blue uppercase tracking-widest">
                 Rune {qIndex + 1}/{diagnosticQuestions.length}
@@ -234,8 +279,7 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
             </div>
         </div>
 
-        {/* Question Area - Flex Grow to take available space */}
-        <div className="flex-1 flex items-center justify-center my-4">
+        <div className="flex-1 flex flex-col items-center justify-center my-4">
             <motion.p 
                 key={qIndex}
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
@@ -248,9 +292,9 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
                 </React.Fragment>
             ))}
             </motion.p>
+            <TranslationControl ru={diagnosticQuestions[qIndex].ru} uz={diagnosticQuestions[qIndex].uz} />
         </div>
 
-        {/* Options Area */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-auto">
             {currentOptions.map((opt, i) => (
                 <button

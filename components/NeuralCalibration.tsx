@@ -8,12 +8,75 @@ interface NeuralProps {
 }
 
 const questions = [
-  { q: "This time next week, I _____ on a dragon's back.", options: ["will fly", "will have flown", "will be flying", "am flying"], a: 2 },
-  { q: "By 2050, wizards _____ a cure for the plague.", options: ["will be finding", "will have found", "find", "are finding"], a: 1 },
-  { q: "Do not disturb. We _____ the feast.", options: ["will have had", "have", "will be having", "had"], a: 2 },
-  { q: "By the time you arrive, the goblins _____.", options: ["will have gone", "will be going", "go", "are going"], a: 0 },
-  { q: "At midnight, the witch _____ her brew.", options: ["will have stirred", "will be stirring", "stirred", "stirs"], a: 1 },
+  { 
+    q: "This time next week, I _____ on a dragon's back.", 
+    options: ["will fly", "will have flown", "will be flying", "am flying"], 
+    a: 2,
+    ru: "В это же время на следующей неделе я буду лететь на спине дракона.",
+    uz: "Keyingi hafta shu vaqtda men ajdaho belida uchayotgan bo'laman."
+  },
+  { 
+    q: "By 2050, wizards _____ a cure for the plague.", 
+    options: ["will be finding", "will have found", "find", "are finding"], 
+    a: 1,
+    ru: "К 2050 году волшебники найдут лекарство от чумы.",
+    uz: "2050 yilga kelib sehrgarlar vabo davosini topgan bo'lishadi."
+  },
+  { 
+    q: "Do not disturb. We _____ the feast.", 
+    options: ["will have had", "have", "will be having", "had"], 
+    a: 2,
+    ru: "Не беспокоить. У нас будет пир.",
+    uz: "Bezovta qilmang. Biz bazm qilayotgan bo'lamiz."
+  },
+  { 
+    q: "By the time you arrive, the goblins _____.", 
+    options: ["will have gone", "will be going", "go", "are going"], 
+    a: 0,
+    ru: "К моменту твоего прибытия гоблины уже уйдут.",
+    uz: "Siz yetib kelguningizcha, goblinlar ketib bo'lishadi."
+  },
+  { 
+    q: "At midnight, the witch _____ her brew.", 
+    options: ["will have stirred", "will be stirring", "stirred", "stirs"], 
+    a: 1,
+    ru: "В полночь ведьма будет помешивать свое варево.",
+    uz: "Yarim tunda jodugar damlamasini aralashtirayotgan bo'ladi."
+  },
 ];
+
+// --- TRANSLATION HELPER ---
+const TranslationControl = ({ ru, uz }: { ru: string, uz: string }) => {
+    const [lang, setLang] = useState<'ru' | 'uz' | null>(null);
+    return (
+        <div className="flex flex-col items-center gap-2 mt-4 z-20 relative">
+            <div className="flex gap-2">
+                <button 
+                    onClick={(e) => { e.stopPropagation(); setLang(lang === 'ru' ? null : 'ru'); }} 
+                    className={`text-xs font-bold px-2 py-1 rounded border ${lang === 'ru' ? 'bg-magic-gold text-obsidian border-magic-gold' : 'border-ink/30 dark:border-parchment/30 text-ink/50 dark:text-parchment/50'}`}
+                >
+                    RU
+                </button>
+                <button 
+                    onClick={(e) => { e.stopPropagation(); setLang(lang === 'uz' ? null : 'uz'); }} 
+                    className={`text-xs font-bold px-2 py-1 rounded border ${lang === 'uz' ? 'bg-emerald-rune text-obsidian border-emerald-rune' : 'border-ink/30 dark:border-parchment/30 text-ink/50 dark:text-parchment/50'}`}
+                >
+                    UZ
+                </button>
+            </div>
+            <AnimatePresence>
+                {lang && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
+                        className="text-sm font-body italic text-ink dark:text-parchment bg-parchment/80 dark:bg-obsidian/80 px-3 py-1 rounded shadow-sm text-center max-w-lg"
+                    >
+                        {lang === 'ru' ? ru : uz}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
 
 const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) => {
   const [index, setIndex] = useState(0);
@@ -26,7 +89,6 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
   
   const timerRef = useRef<any>(null);
 
-  // Auto-advance logic for result screen
   useEffect(() => {
     if (showResult) {
         playSound('success');
@@ -47,7 +109,7 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
           handleTimeOut();
           return 0;
         }
-        if (prev <= 4) playSound('tick'); // Sound hint for low time
+        if (prev <= 4) playSound('tick'); 
         return prev - 1;
       });
     }, 1000);
@@ -115,7 +177,6 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
                 MASTERY: {Math.round((score / questions.length) * 100)}%
             </p>
             
-            {/* Auto-advance loader */}
             <div className="w-64 bg-ink/20 h-2 rounded-full overflow-hidden">
                 <motion.div 
                     initial={{ width: "0%" }}
@@ -134,7 +195,6 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
   return (
     <div className={`h-full w-full bg-parchment dark:bg-obsidian flex flex-col items-center justify-center font-body relative overflow-hidden transition-colors duration-200 bg-paper-texture dark:bg-leather-texture`}>
       
-      {/* Visual Feedback Overlay */}
       {feedbackState === 'correct' && <div className="absolute inset-0 bg-emerald-rune/20 z-0 animate-pulse" />}
       {feedbackState === 'incorrect' && <div className="absolute inset-0 bg-crimson/20 z-0 animate-pulse" />}
 
@@ -145,12 +205,11 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
               {streak > 1 && <div className="text-magic-gold animate-bounce">Streak x{streak}</div>}
           </div>
 
-          {/* Candle Timer */}
           <div className="w-full h-2 bg-ink/20 dark:bg-parchment/20 mb-12 relative rounded-full overflow-hidden">
              <motion.div 
-               key={index} // Force re-render on new question
+               key={index}
                initial={{ width: "100%" }}
-               animate={{ width: isPaused ? `${(timeLeft/15)*100}%` : "0%" }} // Stop animation if paused
+               animate={{ width: isPaused ? `${(timeLeft/15)*100}%` : "0%" }} 
                transition={{ duration: isPaused ? 0 : 15, ease: "linear" }}
                className={`h-full ${timeLeft < 5 ? 'bg-crimson shadow-[0_0_10px_red]' : 'bg-magic-gold shadow-[0_0_10px_gold]'}`}
              />
@@ -163,8 +222,9 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
+                className="flex flex-col items-center"
               >
-                  <h2 className="text-3xl md:text-5xl text-ink dark:text-parchment font-display font-bold mb-12 leading-tight text-center">
+                  <h2 className="text-3xl md:text-5xl text-ink dark:text-parchment font-display font-bold mb-4 leading-tight text-center">
                       {questions[index].q.split("_____").map((part, i) => (
                           <React.Fragment key={i}>
                               {part}
@@ -172,8 +232,12 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
                           </React.Fragment>
                       ))}
                   </h2>
+                  
+                  <div className="mb-12">
+                     <TranslationControl ru={questions[index].ru} uz={questions[index].uz} />
+                  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                       {questions[index].options.map((opt, i) => (
                           <button
                             key={i}
