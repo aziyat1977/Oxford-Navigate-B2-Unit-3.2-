@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { playSound } from '../utils/audio';
 
 interface NeuralProps {
   onComplete: () => void;
@@ -25,8 +26,8 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(15); // 15 seconds per question
-  const [glitch, setGlitch] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(15); 
+  const [feedbackState, setFeedbackState] = useState<'neutral' | 'correct' | 'incorrect'>('neutral');
   const [showResult, setShowResult] = useState(false);
   
   const timerRef = useRef<any>(null);
@@ -34,7 +35,7 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
   // Timer Logic
   useEffect(() => {
     if (showResult) return;
-    setTimeLeft(15); // Reset timer on new question
+    setTimeLeft(15); 
     
     timerRef.current = setInterval(() => {
       setTimeLeft(prev => {
@@ -50,11 +51,12 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
   }, [index]);
 
   const handleTimeOut = () => {
-    setGlitch(true);
+    playSound('error');
+    setFeedbackState('incorrect');
     updateLife(-5);
     setStreak(0);
     setTimeout(() => {
-       setGlitch(false);
+       setFeedbackState('neutral');
        nextQ();
     }, 500);
   };
@@ -71,25 +73,32 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
   const handleAnswer = (optionIndex: number) => {
     const isCorrect = optionIndex === questions[index].a;
     if (isCorrect) {
+        playSound('success');
+        setFeedbackState('correct');
         setScore(prev => prev + 1);
         const streakBonus = streak > 2 ? 2 : 0;
         updateLife(2 + streakBonus);
         setStreak(s => s + 1);
     } else {
-        setGlitch(true);
+        playSound('error');
+        setFeedbackState('incorrect');
         setStreak(0);
         updateLife(-5);
-        setTimeout(() => setGlitch(false), 300);
     }
-    nextQ();
+    
+    // Slight delay to show color
+    setTimeout(() => {
+        setFeedbackState('neutral');
+        nextQ();
+    }, 300);
   };
 
   if (showResult) {
       return (
-        <div className="h-screen w-full bg-slate-950 flex flex-col items-center justify-center font-mono">
-            <h1 className="text-4xl text-neon-green mb-4 font-display font-black">NEURAL LINK ESTABLISHED</h1>
-            <p className="text-white text-xl mb-8">EFFICIENCY: {Math.round((score / questions.length) * 100)}%</p>
-            <button onClick={onComplete} className="px-10 py-4 bg-white text-black font-bold rounded hover:bg-neon-green transition-colors">
+        <div className="h-full w-full bg-gray-100 dark:bg-slate-950 flex flex-col items-center justify-center font-mono">
+            <h1 className="text-4xl text-emerald-600 dark:text-neon-green mb-4 font-display font-black">NEURAL LINK ESTABLISHED</h1>
+            <p className="text-slate-900 dark:text-white text-xl mb-8">EFFICIENCY: {Math.round((score / questions.length) * 100)}%</p>
+            <button onClick={onComplete} className="px-10 py-4 bg-slate-900 dark:bg-white text-white dark:text-black font-bold rounded hover:bg-emerald-600 dark:hover:bg-neon-green transition-colors">
                 ACCESS TIME CAPSULE
             </button>
         </div>
@@ -97,25 +106,28 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
   }
 
   return (
-    <div className={`h-screen w-full bg-slate-950 flex flex-col items-center justify-center font-mono relative overflow-hidden ${glitch ? 'animate-glitch' : ''}`}>
+    <div className={`h-full w-full bg-gray-50 dark:bg-slate-950 flex flex-col items-center justify-center font-mono relative overflow-hidden transition-colors duration-200
+        ${feedbackState === 'incorrect' ? 'bg-red-50 dark:bg-red-900/10' : ''}
+        ${feedbackState === 'correct' ? 'bg-emerald-50 dark:bg-emerald-900/10' : ''}
+    `}>
       
       {/* Dynamic Background */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(0,255,153,0.1),transparent_70%)] opacity-20" />
       
       <div className="z-10 w-full max-w-3xl px-6">
           <div className="flex justify-between items-center mb-6 text-xs font-bold tracking-widest text-slate-500">
-              <div className="text-neon-cyan">SYNC: {index + 1}/{questions.length}</div>
-              {streak > 1 && <div className="text-neon-yellow animate-pulse">STREAK x{streak}</div>}
+              <div className="text-cyan-600 dark:text-neon-cyan">SYNC: {index + 1}/{questions.length}</div>
+              {streak > 1 && <div className="text-yellow-600 dark:text-neon-yellow animate-pulse">STREAK x{streak}</div>}
           </div>
 
           {/* Timer Bar */}
-          <div className="w-full h-1 bg-slate-800 mb-12 relative overflow-hidden">
+          <div className="w-full h-1 bg-slate-200 dark:bg-slate-800 mb-12 relative overflow-hidden">
              <motion.div 
                key={index}
                initial={{ width: "100%" }}
                animate={{ width: "0%" }}
                transition={{ duration: 15, ease: "linear" }}
-               className={`h-full ${timeLeft < 5 ? 'bg-red-500' : 'bg-neon-green'}`}
+               className={`h-full ${timeLeft < 5 ? 'bg-red-500' : 'bg-emerald-500 dark:bg-neon-green'}`}
              />
           </div>
 
@@ -127,11 +139,11 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2 }}
               >
-                  <h2 className="text-2xl md:text-4xl text-white font-bold mb-10 leading-snug">
+                  <h2 className="text-2xl md:text-4xl text-slate-900 dark:text-white font-bold mb-10 leading-snug">
                       {questions[index].q.split("_____").map((part, i) => (
                           <React.Fragment key={i}>
                               {part}
-                              {i === 0 && <span className="inline-block w-32 border-b-4 border-neon-cyan mx-2 animate-pulse"></span>}
+                              {i === 0 && <span className="inline-block w-32 border-b-4 border-cyan-500 dark:border-neon-cyan mx-2 animate-pulse"></span>}
                           </React.Fragment>
                       ))}
                   </h2>
@@ -141,7 +153,8 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
                           <button
                             key={i}
                             onClick={() => handleAnswer(i)}
-                            className="relative p-6 bg-slate-900 border border-slate-700 hover:border-white hover:bg-white hover:text-black transition-all text-left group overflow-hidden"
+                            onMouseEnter={() => playSound('hover')}
+                            className="relative p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-900 dark:hover:border-white hover:bg-slate-50 dark:hover:bg-white dark:hover:text-black transition-all text-left group overflow-hidden text-slate-700 dark:text-slate-200 shadow-sm"
                           >
                               <span className="font-mono text-xs opacity-50 mr-4 group-hover:opacity-100">0{i + 1}</span>
                               <span className="font-bold text-lg">{opt}</span>
@@ -152,10 +165,9 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
           </AnimatePresence>
       </div>
 
-      {/* Red Glitch Overlay */}
-      {glitch && (
-          <div className="absolute inset-0 bg-red-500/20 pointer-events-none flex items-center justify-center z-50 mix-blend-overlay">
-              <span className="text-white font-black text-9xl">ERROR</span>
+      {feedbackState === 'incorrect' && (
+          <div className="absolute inset-0 bg-red-500/10 pointer-events-none flex items-center justify-center z-50">
+              <span className="text-red-500 dark:text-white font-black text-9xl opacity-20 dark:opacity-50 dark:mix-blend-overlay">ERROR</span>
           </div>
       )}
     </div>

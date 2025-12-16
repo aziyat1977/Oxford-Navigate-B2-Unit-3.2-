@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Audiowide&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             fontFamily: {
@@ -22,6 +23,9 @@
               'neon-yellow': '#facc15',
               'dark-bg': '#050505',
               'panel-bg': '#0a0a0a',
+              // Light mode counterparts
+              'light-bg': '#f3f4f6',
+              'light-panel': '#ffffff',
             },
             animation: {
               'pulse-fast': 'pulse 0.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
@@ -48,12 +52,12 @@
     </script>
     <style>
       body {
-        background-color: #050505;
-        color: #e2e8f0;
+        /* Defaults handled by App classes now */
         overflow-x: hidden;
       }
-      /* CRT Overlay Effect */
-      .crt::before {
+      /* CRT Overlay Effect - Only visible in dark mode via CSS variable or class specificity if needed, 
+         but for now we'll keep it global and subtle */
+      .dark .crt::before {
         content: " ";
         display: block;
         position: absolute;
@@ -66,7 +70,7 @@
         background-size: 100% 2px, 3px 100%;
         pointer-events: none;
       }
-      .scanline {
+      .dark .scanline {
         width: 100%;
         height: 100px;
         z-index: 999;
@@ -82,6 +86,12 @@
       }
       ::-webkit-scrollbar-track {
         background: #050505;
+      }
+      .dark ::-webkit-scrollbar-track {
+         background: #050505;
+      }
+      .light ::-webkit-scrollbar-track {
+         background: #e5e7eb;
       }
       ::-webkit-scrollbar-thumb {
         background: #333;
@@ -101,7 +111,7 @@
 </script>
 </head>
   <body>
-    <div id="root" class="crt min-h-screen relative">
+    <div id="root" class="min-h-screen relative transition-colors duration-300">
         <div class="scanline"></div>
     </div>
   </body>

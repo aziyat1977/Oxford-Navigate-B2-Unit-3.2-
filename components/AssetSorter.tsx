@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, useMotionValue, useTransform, AnimatePresence, PanInfo } from 'framer-motion';
+import { playSound } from '../utils/audio';
 
 interface AssetSorterProps {
   onComplete: () => void;
@@ -38,7 +39,7 @@ const Card: React.FC<CardProps> = ({ card, onSwipe, index }) => {
       if (latestX < -threshold && latestY > threshold) return "#ff0055"; // Fritter (Red)
       if (latestX < -threshold && latestY < -threshold) return "#00f3ff"; // Kill (Cyan)
       if (latestX > threshold && latestY > threshold) return "#facc15"; // While (Yellow)
-      return "#334155";
+      return "#334155"; // Default Slate
     }
   );
 
@@ -53,7 +54,10 @@ const Card: React.FC<CardProps> = ({ card, onSwipe, index }) => {
         else if (ox < 0 && oy < 0) dir = "kill";
         else if (ox > 0 && oy > 0) dir = "while";
         
-        if (dir) onSwipe(dir);
+        if (dir) {
+            playSound('swipe');
+            onSwipe(dir);
+        }
     }
   };
 
@@ -64,19 +68,18 @@ const Card: React.FC<CardProps> = ({ card, onSwipe, index }) => {
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={0.7}
       onDragEnd={handleDragEnd}
-      className="absolute w-72 h-96 bg-black border-4 shadow-2xl flex flex-col items-center justify-center p-6 text-center rounded-sm cursor-grab active:cursor-grabbing backdrop-blur-md"
+      className="absolute w-72 h-96 bg-white dark:bg-black border-4 shadow-2xl flex flex-col items-center justify-center p-6 text-center rounded-sm cursor-grab active:cursor-grabbing backdrop-blur-md"
     >
-        <div className="absolute top-2 left-2 w-2 h-2 bg-slate-700 rounded-full" />
-        <div className="absolute top-2 right-2 w-2 h-2 bg-slate-700 rounded-full" />
-        <div className="absolute bottom-2 left-2 w-2 h-2 bg-slate-700 rounded-full" />
-        <div className="absolute bottom-2 right-2 w-2 h-2 bg-slate-700 rounded-full" />
+        <div className="absolute top-2 left-2 w-2 h-2 bg-slate-300 dark:bg-slate-700 rounded-full" />
+        <div className="absolute top-2 right-2 w-2 h-2 bg-slate-300 dark:bg-slate-700 rounded-full" />
+        <div className="absolute bottom-2 left-2 w-2 h-2 bg-slate-300 dark:bg-slate-700 rounded-full" />
+        <div className="absolute bottom-2 right-2 w-2 h-2 bg-slate-300 dark:bg-slate-700 rounded-full" />
         
-        <h2 className="text-white font-display text-2xl font-bold leading-tight select-none drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
+        <h2 className="text-slate-900 dark:text-white font-display text-2xl font-bold leading-tight select-none drop-shadow-sm">
             {card.text}
         </h2>
         
-        {/* Helper Hint fades in on drag */}
-        <motion.div style={{ opacity: useTransform(x, [-50, 0, 50], [1, 0, 1]) }} className="absolute bottom-10 text-[10px] font-mono text-slate-400 border border-slate-800 px-2 py-1 bg-black">
+        <motion.div style={{ opacity: useTransform(x, [-50, 0, 50], [1, 0, 1]) }} className="absolute bottom-10 text-[10px] font-mono text-slate-500 border border-slate-200 dark:border-slate-800 px-2 py-1 bg-gray-50 dark:bg-black">
             {card.hint}
         </motion.div>
     </motion.div>
@@ -96,12 +99,14 @@ const AssetSorter: React.FC<AssetSorterProps> = ({ onComplete, updateLife }) => 
     
     if (isCorrect) {
         setCombo(c => c + 1);
-        updateLife(1); // +1 year
-        setFeedback({ msg: `${direction.toUpperCase()} CONFIRMED`, color: "text-neon-green" });
+        updateLife(1); 
+        playSound('success');
+        setFeedback({ msg: `${direction.toUpperCase()} CONFIRMED`, color: "text-emerald-600 dark:text-neon-green" });
     } else {
         setCombo(0);
-        updateLife(-3); // -3 years (Loss Aversion)
-        setFeedback({ msg: "DATA CORRUPTION", color: "text-neon-pink" });
+        updateLife(-3);
+        playSound('error');
+        setFeedback({ msg: "DATA CORRUPTION", color: "text-red-600 dark:text-neon-pink" });
     }
 
     setIndex(prev => prev + 1);
@@ -111,25 +116,25 @@ const AssetSorter: React.FC<AssetSorterProps> = ({ onComplete, updateLife }) => 
   };
 
   return (
-    <div className="h-screen w-full flex items-center justify-center relative font-mono overflow-hidden">
+    <div className="h-full w-full flex items-center justify-center relative font-mono overflow-hidden">
       
       {/* Background Matrix UI */}
       <div className="absolute inset-0 pointer-events-none">
          {/* Grid Lines */}
-         <div className="absolute left-1/2 top-0 bottom-0 w-px bg-slate-800" />
-         <div className="absolute top-1/2 left-0 right-0 h-px bg-slate-800" />
+         <div className="absolute left-1/2 top-0 bottom-0 w-px bg-slate-200 dark:bg-slate-800" />
+         <div className="absolute top-1/2 left-0 right-0 h-px bg-slate-200 dark:bg-slate-800" />
 
          {/* Quadrant Watermarks */}
-         <div className="absolute top-10 left-10 text-4xl font-display font-black text-slate-900 select-none opacity-50">KILL</div>
-         <div className="absolute top-10 right-10 text-4xl font-display font-black text-slate-900 select-none opacity-50">INVEST</div>
-         <div className="absolute bottom-10 left-10 text-4xl font-display font-black text-slate-900 select-none opacity-50">FRITTER</div>
-         <div className="absolute bottom-10 right-10 text-4xl font-display font-black text-slate-900 select-none opacity-50">WHILE</div>
+         <div className="absolute top-10 left-10 text-4xl font-display font-black text-slate-200 dark:text-slate-900 select-none opacity-50 dark:opacity-50">KILL</div>
+         <div className="absolute top-10 right-10 text-4xl font-display font-black text-slate-200 dark:text-slate-900 select-none opacity-50 dark:opacity-50">INVEST</div>
+         <div className="absolute bottom-10 left-10 text-4xl font-display font-black text-slate-200 dark:text-slate-900 select-none opacity-50 dark:opacity-50">FRITTER</div>
+         <div className="absolute bottom-10 right-10 text-4xl font-display font-black text-slate-200 dark:text-slate-900 select-none opacity-50 dark:opacity-50">WHILE</div>
 
          {/* Axis Labels */}
-         <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[10px] text-neon-green tracking-widest bg-black px-2 border border-neon-green">ACTIVE</div>
+         <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[10px] text-emerald-600 dark:text-neon-green tracking-widest bg-white dark:bg-black px-2 border border-emerald-500 dark:border-neon-green">ACTIVE</div>
          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 tracking-widest">PASSIVE</div>
-         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] text-neon-pink tracking-widest -rotate-90">NEGATIVE</div>
-         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-neon-yellow tracking-widest rotate-90">POSITIVE</div>
+         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] text-red-500 dark:text-neon-pink tracking-widest -rotate-90">NEGATIVE</div>
+         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-yellow-500 dark:text-neon-yellow tracking-widest rotate-90">POSITIVE</div>
       </div>
 
       {/* Combo Meter */}
@@ -137,9 +142,9 @@ const AssetSorter: React.FC<AssetSorterProps> = ({ onComplete, updateLife }) => 
           <div className="text-[10px] text-slate-500">COMBO CHAIN</div>
           <motion.div 
             key={combo} 
-            initial={{ scale: 1.5, color: "#fff" }} 
-            animate={{ scale: 1, color: combo > 2 ? "#00ff99" : "#fff" }}
-            className="text-4xl font-display font-black"
+            initial={{ scale: 1.5 }} 
+            animate={{ scale: 1, color: combo > 2 ? (document.documentElement.classList.contains('dark') ? '#00ff99' : '#059669') : 'currentColor' }}
+            className="text-4xl font-display font-black text-slate-900 dark:text-white"
           >
              x{combo}
           </motion.div>
@@ -155,10 +160,10 @@ const AssetSorter: React.FC<AssetSorterProps> = ({ onComplete, updateLife }) => 
             ) : (
                 <motion.div 
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    className="w-full h-full flex flex-col items-center justify-center bg-black/80 border border-neon-green"
+                    className="w-full h-full flex flex-col items-center justify-center bg-white/80 dark:bg-black/80 border border-emerald-500 dark:border-neon-green rounded-xl"
                 >
-                    <h2 className="text-xl font-bold text-white mb-2">MATRIX ALIGNED</h2>
-                    <div className="w-8 h-8 border-2 border-t-neon-green border-r-transparent border-b-neon-green border-l-transparent rounded-full animate-spin"></div>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">MATRIX ALIGNED</h2>
+                    <div className="w-8 h-8 border-2 border-t-emerald-500 dark:border-t-neon-green border-r-transparent border-b-emerald-500 dark:border-b-neon-green border-l-transparent rounded-full animate-spin"></div>
                 </motion.div>
             )}
          </AnimatePresence>

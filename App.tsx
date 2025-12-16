@@ -1,82 +1,104 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Landing from './components/Landing';
 import AssetSorter from './components/AssetSorter';
 import TimelineGrammar from './components/TimelineGrammar';
 import NeuralCalibration from './components/NeuralCalibration';
 import TimeCapsule from './components/TimeCapsule';
+import Menu from './components/Menu';
 
 const App = () => {
-  const [level, setLevel] = useState(0);
-  // Psychological Trigger: "Years Saved". Starting at 40 years left.
-  // Mistakes reduce this. Good answers increase it.
+  const [currentView, setCurrentView] = useState('home');
   const [lifeExpectancy, setLifeExpectancy] = useState(40); 
+  const [darkMode, setDarkMode] = useState(true);
 
-  const nextLevel = () => setLevel(prev => prev + 1);
-  
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  const toggleTheme = () => setDarkMode(!darkMode);
+
   const updateLife = (years: number) => {
     setLifeExpectancy(prev => Math.max(0, Math.min(100, prev + years)));
   };
 
+  const renderView = () => {
+    switch(currentView) {
+      case 'home':
+        return (
+          <motion.div 
+            key="home" 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="flex flex-col items-center justify-center h-full text-center p-4"
+          >
+             <h1 className="text-6xl md:text-9xl font-display font-black text-slate-900 dark:text-white mb-6">TEMPORA</h1>
+             <p className="font-mono text-slate-600 dark:text-slate-400 max-w-md mx-auto mb-8">
+               AGENCY ACCESS TERMINAL <br/>
+               PLEASE SELECT A MODULE FROM THE MENU
+             </p>
+             <div className="w-16 h-1 bg-emerald-500 dark:bg-neon-green animate-pulse"></div>
+          </motion.div>
+        );
+      case 'diagnostic':
+        return <Landing key="landing" onComplete={() => setCurrentView('sorter')} updateLife={updateLife} />;
+      case 'sorter':
+        return <AssetSorter key="sorter" onComplete={() => setCurrentView('timeline')} updateLife={updateLife} />;
+      case 'timeline':
+        return <TimelineGrammar key="timeline" onComplete={() => setCurrentView('neural')} />;
+      case 'neural':
+        return <NeuralCalibration key="neural" onComplete={() => setCurrentView('capsule')} updateLife={updateLife} />;
+      case 'capsule':
+        return <TimeCapsule key="capsule" lifeExpectancy={lifeExpectancy} />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <main className="text-white selection:bg-neon-pink selection:text-white bg-dark-bg min-h-screen overflow-hidden">
+    <main className={`min-h-screen overflow-hidden transition-colors duration-300 ${darkMode ? 'bg-dark-bg text-white selection:bg-neon-pink selection:text-white' : 'bg-gray-100 text-slate-900 selection:bg-emerald-400'}`}>
       
-      {/* Global Background Grid */}
-      <div className="fixed inset-0 bg-[linear-gradient(rgba(0,255,153,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,153,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none z-0" />
+      {/* Global Background Pattern */}
+      <div className={`fixed inset-0 pointer-events-none z-0 bg-[size:50px_50px] opacity-20 dark:opacity-100
+        ${darkMode 
+          ? 'bg-[linear-gradient(rgba(0,255,153,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,153,0.03)_1px,transparent_1px)]' 
+          : 'bg-[linear-gradient(rgba(0,0,0,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.05)_1px,transparent_1px)]'
+        }`} 
+      />
+      
+      {/* CRT Overlay (Dark Mode Only) */}
+      <div className="crt fixed inset-0 pointer-events-none z-50 opacity-0 dark:opacity-100 transition-opacity" />
 
-      <AnimatePresence mode="wait">
-        {level === 0 && (
-          <motion.div key="lvl0" exit={{ opacity: 0, filter: "blur(20px)" }} className="absolute inset-0 z-10">
-             <Landing onComplete={nextLevel} updateLife={updateLife} />
-          </motion.div>
-        )}
-        
-        {level === 1 && (
-          <motion.div key="lvl1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -1000 }} className="absolute inset-0 z-10">
-             <AssetSorter onComplete={nextLevel} updateLife={updateLife} />
-          </motion.div>
-        )}
-        
-        {level === 2 && (
-          <motion.div key="lvl2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.5 }} className="absolute inset-0 z-10">
-             <TimelineGrammar onComplete={nextLevel} />
-          </motion.div>
-        )}
-        
-        {level === 3 && (
-          <motion.div key="lvl3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-10">
-             <NeuralCalibration onComplete={nextLevel} updateLife={updateLife} />
-          </motion.div>
-        )}
-        
-        {level === 4 && (
-          <motion.div key="lvl4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 z-10">
-             <TimeCapsule lifeExpectancy={lifeExpectancy} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Navigation & HUD */}
+      <Menu currentView={currentView} setView={setCurrentView} darkMode={darkMode} toggleTheme={toggleTheme} />
 
-      {/* Persistent HUD (Heads Up Display) */}
-      {level > 0 && (
-        <div className="fixed top-0 w-full z-50 flex justify-between items-center p-6 pointer-events-none mix-blend-exclusion">
-          <div className="flex flex-col">
-            <div className="text-[10px] font-mono text-gray-400">TEMPORA OS v4.0</div>
-            <div className="text-xs text-neon-cyan font-bold tracking-widest">
-                SEQUENCE: {['INIT', 'SORT', 'SYNC', 'TEST', 'SAVE'][level]}
-            </div>
-          </div>
-          
-          <div className="flex flex-col items-end">
-             <div className="text-[10px] font-mono text-gray-400 uppercase">Life Expectancy</div>
+      {/* View Container */}
+      <div className="relative z-10 w-full h-screen">
+         <AnimatePresence mode="wait">
+            {renderView()}
+         </AnimatePresence>
+      </div>
+
+      {/* HUD: Life Expectancy */}
+      {currentView !== 'home' && (
+        <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end pointer-events-none">
+             <div className="text-[10px] font-mono text-slate-500 uppercase bg-white/80 dark:bg-black/80 px-2">Life Expectancy</div>
              <motion.div 
                key={lifeExpectancy}
-               initial={{ scale: 1.5, color: "#fff" }}
-               animate={{ scale: 1, color: lifeExpectancy < 20 ? "#ff0055" : "#00ff99" }}
-               className="text-2xl font-display font-black tracking-tighter"
+               initial={{ scale: 1.5 }}
+               animate={{ 
+                 scale: 1, 
+                 color: lifeExpectancy < 20 
+                   ? '#ef4444' // red-500
+                   : darkMode ? '#00ff99' : '#059669' // neon-green vs emerald-600
+               }}
+               className="text-3xl font-display font-black tracking-tighter drop-shadow-lg"
              >
-                {lifeExpectancy} YEARS
+                {lifeExpectancy} YRS
              </motion.div>
-          </div>
         </div>
       )}
     </main>
