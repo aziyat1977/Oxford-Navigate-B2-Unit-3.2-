@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { playSound } from '../utils/audio';
 
@@ -9,6 +9,15 @@ interface TimelineProps {
 const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
   const [stage, setStage] = useState<'intro' | 'scene1' | 'check1' | 'scene2' | 'check2' | 'finish'>('intro');
   const [error, setError] = useState(false);
+
+  // Auto-advance logic for finish stage
+  useEffect(() => {
+    if (stage === 'finish') {
+      playSound('success');
+      const timer = setTimeout(onComplete, 5000); // 5 seconds to read
+      return () => clearTimeout(timer);
+    }
+  }, [stage, onComplete]);
 
   // CCQ Verification Logic
   const verify = (correct: boolean, nextStage: any) => {
@@ -156,7 +165,7 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
           </motion.div>
         )}
 
-        {/* 6. FINISH */}
+        {/* 6. FINISH (Automatic Transition) */}
         {stage === 'finish' && (
            <motion.div key="fin" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center p-12 border-4 border-double border-magic-gold rounded-lg bg-obsidian text-parchment shadow-2xl max-w-lg mx-4">
                <h2 className="text-3xl font-display font-bold mb-6 text-magic-gold">Knowledge Inscribed</h2>
@@ -164,12 +173,19 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
                    <p><span className="text-mystic-blue font-bold text-xl">Future Continuous:</span><br/> The spell is casting. (will be -ing)</p>
                    <p><span className="text-crimson font-bold text-xl">Future Perfect:</span><br/> The quest is complete. (will have -ed)</p>
                </div>
-               <button 
-                onClick={() => { playSound('click'); onComplete(); }}
-                className="w-full py-4 bg-magic-gold text-ink font-display font-bold hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_#d4af37]"
-               >
-                   ENTER THE TRIAL OF WITS
-               </button>
+               
+               {/* Auto-advance loader */}
+               <div className="w-full bg-ink/50 h-2 rounded-full overflow-hidden mt-8">
+                  <motion.div 
+                    initial={{ width: "0%" }}
+                    animate={{ width: "100%" }}
+                    transition={{ duration: 5, ease: "linear" }}
+                    className="h-full bg-magic-gold"
+                  />
+               </div>
+               <p className="text-xs font-rune mt-2 text-magic-gold/80 animate-pulse">
+                   Opening the Realm Gate...
+               </p>
            </motion.div>
         )}
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { playSound } from '../utils/audio';
 
 interface PangeaProps {
   onComplete: () => void;
@@ -8,19 +9,17 @@ interface PangeaProps {
 const steps = [
   {
     id: 1,
-    context: "OBSERVATION: Australia is drifting North right now. It won't stop.",
-    prompt: "In 2050, Australia ____________ (continue) to move north.",
-    answer: "will be continuing",
-    hint: "Use Future Continuous for a process in progress.",
-    mapState: "drifting"
+    context: "VISION: The floating isles are drifting apart. The process is ongoing.",
+    prompt: "In the coming age, the isles ____________ (drift) further.",
+    answer: "will be drifting",
+    hint: "Use Future Continuous for a process in flow.",
   },
   {
     id: 2,
-    context: "DEADLINE: The crash happens before 2050. It's done by then.",
-    prompt: "By 2050, Africa ____________ (collide) with Europe.",
-    answer: "will have collided",
-    hint: "Use Future Perfect for a completed action before a time.",
-    mapState: "crashed"
+    context: "PROPHECY: The convergence happens before the eclipse. It is finished by then.",
+    prompt: "By the eclipse, the realms ____________ (unite) once more.",
+    answer: "will have united",
+    hint: "Use Future Perfect for a completed fate.",
   }
 ];
 
@@ -34,6 +33,7 @@ const PangeaSim: React.FC<PangeaProps> = ({ onComplete }) => {
   const checkAnswer = () => {
     const cleanInput = input.toLowerCase().trim();
     if (cleanInput === currentStep.answer) {
+      playSound('success');
       setStatus("success");
       setTimeout(() => {
         if (stepIndex + 1 < steps.length) {
@@ -41,99 +41,121 @@ const PangeaSim: React.FC<PangeaProps> = ({ onComplete }) => {
             setInput("");
             setStatus("idle");
         } else {
+            // Auto-advance
             onComplete();
         }
-      }, 2000);
+      }, 2500);
     } else {
+      playSound('error');
       setStatus("error");
       setTimeout(() => setStatus("idle"), 2000);
     }
   };
 
   return (
-    <div className="h-screen w-full bg-slate-950 flex flex-col items-center justify-center relative overflow-hidden">
+    <div className="h-full w-full bg-parchment dark:bg-obsidian flex flex-col items-center justify-center relative overflow-hidden bg-paper-texture dark:bg-leather-texture transition-colors">
       
-      {/* 3D Planet Simulation Visual */}
-      <div className="relative w-64 h-64 md:w-96 md:h-96 mb-12 flex items-center justify-center">
-        {/* Wireframe Globe */}
-        <div className={`absolute inset-0 rounded-full border border-slate-700 opacity-50 ${status === 'error' ? 'animate-glitch' : 'animate-[spin_20s_linear_infinite]'}`}>
-            {/* Latitude/Longitude Lines mockup using gradients */}
-            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.05),transparent)]"></div>
+      {/* 3D Realm Visual (Abstract Representation) */}
+      <div className="relative w-72 h-72 md:w-96 md:h-96 mb-12 flex items-center justify-center">
+        
+        {/* Magic Circle Background */}
+        <div className={`absolute inset-0 rounded-full border-4 border-double border-ink/20 dark:border-magic-gold/20 ${status === 'error' ? 'animate-pulse border-crimson' : 'animate-[spin_60s_linear_infinite]'}`}>
+            <svg viewBox="0 0 100 100" className="opacity-30">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeDasharray="5,5" />
+                <path d="M50 10 L90 90 L10 90 Z" fill="none" stroke="currentColor" />
+            </svg>
         </div>
 
-        {/* Continents Logic */}
-        {/* Australia */}
+        {/* Floating Isles Logic */}
+        {/* Isle 1 */}
         <motion.div 
-            className="absolute w-16 h-12 bg-purple-600/60 rounded-full blur-md"
-            initial={{ x: 60, y: 60 }}
-            animate={currentStep.id === 1 && status === 'success' ? { x: 60, y: 30 } : { x: 60, y: 60 }}
-            transition={{ duration: 2 }}
-        />
+            className="absolute w-24 h-24 bg-mystic-blue/40 rounded-full blur-md flex items-center justify-center"
+            initial={{ x: -40, y: -40 }}
+            animate={
+                stepIndex === 0 
+                ? { x: [-40, -60, -40], y: [-40, -20, -40] } // Drifting
+                : { x: 0, y: 0 } // Uniting
+            }
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        >
+             <span className="text-2xl opacity-50">🏝️</span>
+        </motion.div>
         
-        {/* Africa & Europe */}
+        {/* Isle 2 */}
         <motion.div 
-            className="absolute w-24 h-24 bg-emerald-600/60 rounded-full blur-md"
-            animate={currentStep.id === 2 && status === 'success' ? { x: -10, y: 0 } : { x: -30, y: 10 }}
-            transition={{ duration: 1 }}
-        />
-         <motion.div 
-            className="absolute w-20 h-16 bg-blue-600/60 rounded-full blur-md"
-            animate={currentStep.id === 2 && status === 'success' ? { x: -10, y: -40 } : { x: -10, y: -60 }}
-            transition={{ duration: 1 }}
-        />
+            className="absolute w-32 h-32 bg-emerald-rune/40 rounded-full blur-md flex items-center justify-center"
+            initial={{ x: 40, y: 40 }}
+            animate={
+                stepIndex === 0 
+                ? { x: [40, 60, 40], y: [40, 20, 40] } // Drifting
+                : { x: 0, y: 0 } // Uniting
+            }
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        >
+             <span className="text-3xl opacity-50">🏔️</span>
+        </motion.div>
 
-        {status === 'success' && (
-            <motion.div 
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 2, opacity: 0 }}
-                transition={{ duration: 0.8 }}
-                className="absolute w-full h-full border-4 border-white rounded-full"
-            />
-        )}
+        {/* Success Burst */}
+        <AnimatePresence>
+            {status === 'success' && (
+                <motion.div 
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1.5, opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 bg-magic-gold/20 rounded-full blur-xl z-0"
+                />
+            )}
+        </AnimatePresence>
       </div>
 
-      {/* Interface */}
-      <div className="z-10 bg-slate-900/80 p-8 rounded-xl border border-slate-700 backdrop-blur-md max-w-lg w-full shadow-2xl">
-        <div className="flex justify-between items-center mb-4">
-            <h2 className="text-neon-cyan font-mono text-sm">TIMELINE REPAIR: {stepIndex + 1}/{steps.length}</h2>
+      {/* Spell Interface */}
+      <div className="z-10 bg-parchment/90 dark:bg-obsidian/90 p-8 rounded-lg border-[6px] border-double border-ink dark:border-magic-gold backdrop-blur-sm max-w-xl w-full shadow-2xl mx-4">
+        <div className="flex justify-between items-center mb-6 border-b border-ink/20 dark:border-magic-gold/20 pb-2">
+            <h2 className="text-crimson dark:text-mystic-blue font-display font-bold">REALM CONVERGENCE</h2>
+            <span className="font-rune text-ink dark:text-parchment">Phase {stepIndex + 1}/{steps.length}</span>
         </div>
         
-        <p className="text-slate-400 font-mono text-xs mb-2">{currentStep.context}</p>
+        <p className="text-ink/60 dark:text-parchment/60 font-body italic mb-4 text-sm">{currentStep.context}</p>
         
-        <p className="text-white text-xl mb-6 font-display leading-relaxed">
+        <p className="text-ink dark:text-parchment text-xl md:text-2xl mb-8 font-display leading-relaxed">
              {currentStep.prompt.split("____________").map((part, i) => (
                  <React.Fragment key={i}>
                     {part}
-                    {i === 0 && <span className="inline-block w-32 border-b-2 border-slate-500 mx-1"></span>}
+                    {i === 0 && <span className="inline-block w-40 border-b-2 border-dashed border-ink dark:border-magic-gold mx-2"></span>}
                  </React.Fragment>
              ))}
         </p>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 relative">
             <input 
                 type="text" 
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Type the verb form..."
-                className={`flex-1 bg-black border-2 rounded px-4 py-3 text-white font-mono focus:outline-none ${status === 'error' ? 'border-red-500' : 'border-slate-600 focus:border-neon-green'}`}
+                placeholder="Incant the verb..."
+                className={`flex-1 bg-ink/5 dark:bg-parchment/10 border-2 rounded px-4 py-3 text-ink dark:text-parchment font-body text-xl focus:outline-none focus:ring-0
+                    ${status === 'error' ? 'border-crimson' : 'border-ink/30 dark:border-magic-gold/50 focus:border-magic-gold'}
+                `}
+                onKeyDown={(e) => e.key === 'Enter' && checkAnswer()}
             />
             <button 
                 onClick={checkAnswer}
-                className="bg-white hover:bg-neon-green text-black font-bold px-6 py-3 rounded transition-colors font-display"
+                className="bg-ink dark:bg-magic-gold text-parchment dark:text-ink font-bold px-6 py-3 rounded border-2 border-transparent hover:scale-105 active:scale-95 transition-all font-display shadow-md"
             >
-                REPAIR
+                CAST
             </button>
+            
+            {/* Success Particles */}
+            {status === 'success' && (
+                 <motion.div initial={{ y: 0, opacity: 1 }} animate={{ y: -50, opacity: 0 }} className="absolute right-0 -top-10 text-magic-gold font-bold">
+                     ✨ CAST SUCCESSFUL
+                 </motion.div>
+            )}
         </div>
 
         {status === 'error' && (
-            <div className="mt-4 text-red-500 font-mono text-sm animate-pulse">
-                ERROR: TEMPORAL DISSONANCE. {currentStep.hint}
-            </div>
-        )}
-        {status === 'success' && (
-            <div className="mt-4 text-neon-green font-mono text-sm">
-                SEQUENCE STABILIZED.
-            </div>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 text-crimson font-display font-bold text-sm flex items-center gap-2">
+                <span>⚡</span> {currentStep.hint}
+            </motion.div>
         )}
       </div>
     </div>

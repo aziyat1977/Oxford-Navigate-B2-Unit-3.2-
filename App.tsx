@@ -5,6 +5,7 @@ import AssetSorter from './components/AssetSorter';
 import TimelineGrammar from './components/TimelineGrammar';
 import NeuralCalibration from './components/NeuralCalibration';
 import TimeCapsule from './components/TimeCapsule';
+import PangeaSim from './components/PangeaSim';
 import Menu from './components/Menu';
 
 const App = () => {
@@ -26,13 +27,20 @@ const App = () => {
     setLifeExpectancy(prev => Math.max(0, Math.min(100, prev + years)));
   };
 
+  // Transition variants for "Ultra Interactive" feel
+  const pageVariants = {
+    initial: { opacity: 0, scale: 0.9, filter: "blur(10px)" },
+    animate: { opacity: 1, scale: 1, filter: "blur(0px)", transition: { duration: 0.6, ease: "easeOut" } },
+    exit: { opacity: 0, scale: 1.1, filter: "blur(10px)", transition: { duration: 0.4, ease: "easeIn" } }
+  };
+
   const renderView = () => {
     switch(currentView) {
       case 'home':
         return (
           <motion.div 
             key="home" 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            variants={pageVariants} initial="initial" animate="animate" exit="exit"
             className="flex flex-col items-center justify-center h-full text-center p-4"
           >
              <h1 className="text-5xl md:text-8xl font-display font-bold text-ink dark:text-parchment mb-6 drop-shadow-lg">
@@ -48,15 +56,41 @@ const App = () => {
           </motion.div>
         );
       case 'diagnostic':
-        return <Landing key="landing" onComplete={() => setCurrentView('sorter')} updateLife={updateLife} />;
+        return (
+            <motion.div key="landing" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full w-full">
+                <Landing onComplete={() => setCurrentView('sorter')} updateLife={updateLife} />
+            </motion.div>
+        );
       case 'sorter':
-        return <AssetSorter key="sorter" onComplete={() => setCurrentView('timeline')} updateLife={updateLife} />;
+        return (
+            <motion.div key="sorter" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full w-full">
+                <AssetSorter onComplete={() => setCurrentView('timeline')} updateLife={updateLife} />
+            </motion.div>
+        );
       case 'timeline':
-        return <TimelineGrammar key="timeline" onComplete={() => setCurrentView('neural')} />;
+        return (
+            <motion.div key="timeline" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full w-full">
+                <TimelineGrammar onComplete={() => setCurrentView('pangea')} />
+            </motion.div>
+        );
+      case 'pangea':
+        return (
+            <motion.div key="pangea" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full w-full">
+                <PangeaSim onComplete={() => setCurrentView('neural')} />
+            </motion.div>
+        );
       case 'neural':
-        return <NeuralCalibration key="neural" onComplete={() => setCurrentView('capsule')} updateLife={updateLife} />;
+        return (
+            <motion.div key="neural" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full w-full">
+                <NeuralCalibration onComplete={() => setCurrentView('capsule')} updateLife={updateLife} />
+            </motion.div>
+        );
       case 'capsule':
-        return <TimeCapsule key="capsule" lifeExpectancy={lifeExpectancy} />;
+        return (
+            <motion.div key="capsule" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full w-full">
+                <TimeCapsule lifeExpectancy={lifeExpectancy} />
+            </motion.div>
+        );
       default:
         return null;
     }

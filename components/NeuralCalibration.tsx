@@ -22,9 +22,18 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
   const [timeLeft, setTimeLeft] = useState(15); 
   const [feedbackState, setFeedbackState] = useState<'neutral' | 'correct' | 'incorrect'>('neutral');
   const [showResult, setShowResult] = useState(false);
-  const [isPaused, setIsPaused] = useState(false); // New state to pause timer during feedback
+  const [isPaused, setIsPaused] = useState(false); 
   
   const timerRef = useRef<any>(null);
+
+  // Auto-advance logic for result screen
+  useEffect(() => {
+    if (showResult) {
+        playSound('success');
+        const timer = setTimeout(onComplete, 4000);
+        return () => clearTimeout(timer);
+    }
+  }, [showResult, onComplete]);
 
   useEffect(() => {
     if (showResult || isPaused) return;
@@ -47,12 +56,12 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
   }, [index, isPaused, showResult]);
 
   const handleTimeOut = () => {
-    if (isPaused) return; // Prevent double trigger
+    if (isPaused) return; 
     playSound('error');
     setFeedbackState('incorrect');
     updateLife(-5);
     setStreak(0);
-    setIsPaused(true); // Pause logic
+    setIsPaused(true); 
     
     setTimeout(() => {
        setIsPaused(false);
@@ -71,9 +80,9 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
   };
 
   const handleAnswer = (optionIndex: number) => {
-    if (isPaused) return; // Prevent multiple clicks
+    if (isPaused) return; 
     
-    clearInterval(timerRef.current); // Stop timer immediately
+    clearInterval(timerRef.current); 
     setIsPaused(true);
 
     const isCorrect = optionIndex === questions[index].a;
@@ -95,7 +104,7 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
         setIsPaused(false);
         setFeedbackState('neutral');
         nextQ();
-    }, 800); // Wait for animation
+    }, 800); 
   };
 
   if (showResult) {
@@ -105,9 +114,19 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
             <p className="text-ink dark:text-parchment text-2xl mb-8 font-body italic">
                 MASTERY: {Math.round((score / questions.length) * 100)}%
             </p>
-            <button onClick={() => { playSound('click'); onComplete(); }} className="px-10 py-4 bg-ink text-parchment text-xl font-bold rounded-sm border-2 border-magic-gold hover:bg-crimson active:scale-95 transition-all shadow-lg">
-                OPEN THE GRIMOIRE
-            </button>
+            
+            {/* Auto-advance loader */}
+            <div className="w-64 bg-ink/20 h-2 rounded-full overflow-hidden">
+                <motion.div 
+                    initial={{ width: "0%" }}
+                    animate={{ width: "100%" }}
+                    transition={{ duration: 4, ease: "linear" }}
+                    className="h-full bg-magic-gold"
+                />
+            </div>
+             <p className="text-xs font-rune mt-2 text-ink/60 dark:text-parchment/60 animate-pulse">
+                Unlocking the Grimoire...
+             </p>
         </div>
       );
   }
