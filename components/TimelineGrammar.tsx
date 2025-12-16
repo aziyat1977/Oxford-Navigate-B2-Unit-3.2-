@@ -16,7 +16,11 @@ const tenseData = {
     color: "text-mystic-blue",
     borderColor: "border-mystic-blue",
     context: "At sunset tomorrow, do not disturb the Archmage...",
-    example: "He will be casting the spell.",
+    examples: [
+        "He will be casting the spell.",
+        "At noon, I will be crossing the bridge.",
+        "They will be waiting for us in the shadows."
+    ],
     meanings: {
       en: "Action IN PROGRESS at a specific future moment.",
       ru: "Действие В ПРОЦЕССЕ в определенный момент будущего.",
@@ -36,7 +40,11 @@ const tenseData = {
     color: "text-crimson",
     borderColor: "border-crimson",
     context: "By the time the moon rises...",
-    example: "I will have finished the potion.",
+    examples: [
+        "I will have finished the potion.",
+        "By dawn, the army will have retreated.",
+        "She will have mastered the elements by then."
+    ],
     meanings: {
       en: "Action COMPLETED BEFORE a future deadline.",
       ru: "Действие ЗАВЕРШЕННОЕ к моменту в будущем.",
@@ -176,8 +184,19 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
                   <div className="text-center">
                       <p className="text-lg font-rune opacity-70 mb-4">The Scenario</p>
                       <p className="text-2xl md:text-3xl font-body italic leading-relaxed mb-6">"{data.context}"</p>
-                      <div className="p-4 bg-ink/5 dark:bg-parchment/10 rounded border-l-4 border-magic-gold text-xl font-bold">
-                          {data.example}
+                      
+                      <div className="space-y-3">
+                        {data.examples.map((ex, i) => (
+                             <motion.div 
+                                key={i}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: i * 0.2 }}
+                                className="p-4 bg-ink/5 dark:bg-parchment/10 rounded border-l-4 border-magic-gold text-lg md:text-xl font-bold text-left"
+                             >
+                                {ex}
+                             </motion.div>
+                        ))}
                       </div>
                   </div>
               )}

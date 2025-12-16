@@ -7,12 +7,63 @@ interface LandingProps {
   updateLife: (years: number) => void;
 }
 
+// Utility to shuffle array
+const shuffle = (array: string[]) => {
+  return [...array].sort(() => Math.random() - 0.5);
+};
+
+// Expanded Question Set with 4 options each
 const diagnosticQuestions = [
-  { q: "Do not disturb me at sunset. I _____ the stars.", options: ["will have watched", "will be watching"], a: 1 },
-  { q: "By the time we arrive, the potion _____.", options: ["will be bubbling", "will have brewed"], a: 1 },
-  { q: "This time next century, I _____ in the High Tower.", options: ["will have lived", "will be living"], a: 1 },
-  { q: "I _____ tomorrow, so let us duel.", options: ["won't have practiced", "won't be practicing"], a: 1 },
-  { q: "By the witching hour, I _____ all the mana.", options: ["will be draining", "will have drained"], a: 1 },
+  { 
+    q: "Do not disturb me at sunset. I _____ the stars.", 
+    options: ["will be watching", "will have watched", "am watching", "will watch"], 
+    answer: "will be watching" 
+  },
+  { 
+    q: "By the time we arrive, the potion _____.", 
+    options: ["will have brewed", "will be brewing", "brews", "has brewed"], 
+    answer: "will have brewed" 
+  },
+  { 
+    q: "This time next century, I _____ in the High Tower.", 
+    options: ["will be living", "will have lived", "live", "am living"], 
+    answer: "will be living" 
+  },
+  { 
+    q: "I _____ tomorrow, so let us duel.", 
+    options: ["won't be practicing", "won't have practiced", "don't practice", "not practicing"], 
+    answer: "won't be practicing" 
+  },
+  { 
+    q: "By the witching hour, I _____ all the mana.", 
+    options: ["will have drained", "will be draining", "drain", "am draining"], 
+    answer: "will have drained" 
+  },
+  {
+    q: "In ten years, the Guild _____ a new leader.",
+    options: ["will have chosen", "will be choosing", "chose", "is choosing"],
+    answer: "will have chosen"
+  },
+  {
+    q: "Don't enter the sanctum. She _____ a ritual.",
+    options: ["will be performing", "will have performed", "performs", "performed"],
+    answer: "will be performing"
+  },
+  {
+    q: "By 2040, nature _____ the ruins.",
+    options: ["will have reclaimed", "will be reclaiming", "reclaims", "is reclaiming"],
+    answer: "will have reclaimed"
+  },
+  {
+    q: "Look at the hourglass. We _____ late.",
+    options: ["will be", "will have been", "are being", "have been"],
+    answer: "will be"
+  },
+  {
+    q: "At noon, the army _____ the bridge.",
+    options: ["will be crossing", "will have crossed", "crosses", "is crossing"],
+    answer: "will be crossing"
+  }
 ];
 
 const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
@@ -22,6 +73,10 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
   const [score, setScore] = useState(0);
   const [progress, setProgress] = useState(0);
   const [feedbackState, setFeedbackState] = useState<'neutral' | 'correct' | 'incorrect'>('neutral');
+  
+  // State for shuffled options to ensure randomization
+  const [currentOptions, setCurrentOptions] = useState<string[]>([]);
+
   const requestRef = useRef<number>();
 
   useEffect(() => {
@@ -29,6 +84,13 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
     const timer = setTimeout(() => setPhase('ritual'), 3000);
     return () => clearTimeout(timer);
   }, []);
+
+  // Shuffle options whenever the question index changes
+  useEffect(() => {
+    if (qIndex < diagnosticQuestions.length) {
+      setCurrentOptions(shuffle(diagnosticQuestions[qIndex].options));
+    }
+  }, [qIndex]);
 
   const startHolding = () => {
     initAudio(); 
@@ -65,10 +127,10 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
     return () => { if (requestRef.current) cancelAnimationFrame(requestRef.current); };
   }, [isHolding, progress]);
 
-  const handleAnswer = (optionIndex: number) => {
+  const handleAnswer = (selectedOption: string) => {
     if (feedbackState !== 'neutral') return;
 
-    const isCorrect = optionIndex === diagnosticQuestions[qIndex].a;
+    const isCorrect = selectedOption === diagnosticQuestions[qIndex].answer;
     const nextScore = isCorrect ? score + 1 : score;
 
     if (isCorrect) {
@@ -168,7 +230,7 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
                  <div className="flex items-center gap-2">
                      <span className="text-sm font-display font-bold text-crimson dark:text-mystic-blue">Attunement Trial</span>
                  </div>
-                 <div className="font-rune text-ink dark:text-parchment opacity-70">Rune {qIndex + 1}/5</div>
+                 <div className="font-rune text-ink dark:text-parchment opacity-70">Rune {qIndex + 1}/{diagnosticQuestions.length}</div>
              </div>
 
              <motion.div key={qIndex} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -182,14 +244,14 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
                  </p>
              </motion.div>
 
-             <div className="flex flex-col gap-4">
-                 {diagnosticQuestions[qIndex].options.map((opt, i) => (
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 {currentOptions.map((opt, i) => (
                      <button
                         key={i}
-                        onClick={() => handleAnswer(i)}
-                        className="group relative px-6 py-4 border-2 border-ink/20 dark:border-magic-gold/40 hover:border-magic-gold hover:bg-ink/5 dark:hover:bg-magic-gold/10 text-left transition-all active:scale-95 active:bg-ink/10 dark:active:bg-magic-gold/20"
+                        onClick={() => handleAnswer(opt)}
+                        className="group relative px-4 py-4 border-2 border-ink/20 dark:border-magic-gold/40 hover:border-magic-gold hover:bg-ink/5 dark:hover:bg-magic-gold/10 text-left transition-all active:scale-95 active:bg-ink/10 dark:active:bg-magic-gold/20 flex items-center"
                      >
-                         <span className="font-display font-bold text-lg text-ink dark:text-parchment group-hover:text-crimson dark:group-hover:text-magic-gold transition-colors">{opt}</span>
+                         <span className="font-display font-bold text-base text-ink dark:text-parchment group-hover:text-crimson dark:group-hover:text-magic-gold transition-colors">{opt}</span>
                      </button>
                  ))}
              </div>
