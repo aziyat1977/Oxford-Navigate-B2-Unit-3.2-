@@ -9,6 +9,7 @@ import PangeaSim from './components/PangeaSim';
 import Menu from './components/Menu';
 import CelebrationScreen from './components/CelebrationScreen';
 import KahootQuiz from './components/KahootQuiz';
+import BamboozleGame from './components/BamboozleGame';
 
 /**
  * --- QUANTUM RESPONSIVE LAYOUT ENGINE V3.0 ---
@@ -215,6 +216,9 @@ const App = () => {
         case 'kahoot':
             data = { badge: '🏆', title: 'Arena Champion', subtitle: 'You have proven your worth in combat.', nextView: nextViewId };
             break;
+        case 'bamboozle':
+            data = { badge: '🎭', title: 'Trickster God', subtitle: 'You have survived the chaos of Bamboozle.', nextView: 'home' };
+            break;
         default:
             break;
     }
@@ -314,7 +318,13 @@ const App = () => {
       case 'kahoot':
         return (
             <ViewWrapper k="kahoot">
-                <KahootQuiz onComplete={() => handleLevelComplete('home')} updateLife={updateLife} />
+                <KahootQuiz onComplete={() => handleLevelComplete('bamboozle')} updateLife={updateLife} />
+            </ViewWrapper>
+        );
+      case 'bamboozle':
+        return (
+            <ViewWrapper k="bamboozle">
+                <BamboozleGame onComplete={() => handleLevelComplete('home')} />
             </ViewWrapper>
         );
       default:

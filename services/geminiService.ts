@@ -32,3 +32,45 @@ export const analyzeManifesto = async (text: string): Promise<string> => {
     return "A DARK MAGIC BLOCKS THE PROPHECY.";
   }
 };
+
+export const generateBamboozleQuestions = async (): Promise<any[]> => {
+  if (!apiKey) return [];
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: `Generate 16 unique quiz questions for a "Bamboozle" style game for teenagers (ESL B2 Level).
+      
+      Topic: Future Perfect vs Future Continuous.
+      Vocabulary to include: fritter away, invest, kill time, run out of, set aside, while away, get money's worth.
+      
+      Themes: Viral trends, TikTok, Gaming (Roblox, Minecraft, Valorant), Celebrities (Taylor Swift, MrBeast), Anime.
+      
+      Format: JSON Array of objects.
+      
+      Structure:
+      [
+        {
+          "q": "By 2030, MrBeast _____ (give away) a billion dollars.",
+          "a": "will have given away"
+        },
+        {
+           "q": "Don't call me at 8 PM. I _____ (rank up) in Valorant.",
+           "a": "will be ranking up"
+        }
+      ]
+      
+      Strictly return ONLY the JSON array. No markdown formatting.`,
+      config: {
+        responseMimeType: "application/json"
+      }
+    });
+    
+    const text = response.text;
+    if (!text) return [];
+    return JSON.parse(text);
+  } catch (error) {
+    console.error("Bamboozle Gen Error:", error);
+    return [];
+  }
+};
