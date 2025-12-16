@@ -14,7 +14,8 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
   useEffect(() => {
     if (stage === 'finish') {
       playSound('success');
-      const timer = setTimeout(onComplete, 5000); // 5 seconds to read
+      // Trigger completion immediately so Celebration Screen appears
+      const timer = setTimeout(onComplete, 3000); 
       return () => clearTimeout(timer);
     }
   }, [stage, onComplete]);
@@ -174,12 +175,12 @@ const TimelineGrammar: React.FC<TimelineProps> = ({ onComplete }) => {
                    <p><span className="text-crimson font-bold text-xl">Future Perfect:</span><br/> The quest is complete. (will have -ed)</p>
                </div>
                
-               {/* Auto-advance loader */}
+               {/* Loader */}
                <div className="w-full bg-ink/50 h-2 rounded-full overflow-hidden mt-8">
                   <motion.div 
                     initial={{ width: "0%" }}
                     animate={{ width: "100%" }}
-                    transition={{ duration: 5, ease: "linear" }}
+                    transition={{ duration: 3, ease: "linear" }}
                     className="h-full bg-magic-gold"
                   />
                </div>

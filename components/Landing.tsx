@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { playSound, initAudio } from '../utils/audio';
 
 interface LandingProps {
-  onComplete: () => void;
+  onComplete: (score: number) => void;
   updateLife: (years: number) => void;
 }
 
@@ -16,7 +16,7 @@ const diagnosticQuestions = [
 ];
 
 const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
-  const [phase, setPhase] = useState<'intro' | 'ritual' | 'diagnostic' | 'result'>('intro');
+  const [phase, setPhase] = useState<'intro' | 'ritual' | 'diagnostic'>('intro');
   const [isHolding, setIsHolding] = useState(false);
   const [qIndex, setQIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -31,7 +31,7 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
   }, []);
 
   const startHolding = () => {
-    initAudio(); // Initialize audio context on first user interaction
+    initAudio(); 
     setIsHolding(true);
   };
 
@@ -42,9 +42,8 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
   const updateProgress = () => {
     if (isHolding) {
       setProgress((prev) => {
-        const next = prev + 1.5; // Slightly faster for better UX
+        const next = prev + 1.5; 
         if (next >= 100) {
-          // Sound removed to silence start of diagnostic phase
           setPhase('diagnostic');
           return 100;
         }
@@ -52,7 +51,6 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
       });
       requestRef.current = requestAnimationFrame(updateProgress);
     } else {
-        // Decay progress if they let go
         setProgress(prev => Math.max(0, prev - 2));
         if (progress > 0) requestRef.current = requestAnimationFrame(updateProgress);
     }
@@ -68,12 +66,15 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
   }, [isHolding, progress]);
 
   const handleAnswer = (optionIndex: number) => {
+    if (feedbackState !== 'neutral') return;
+
     const isCorrect = optionIndex === diagnosticQuestions[qIndex].a;
-    
+    const nextScore = isCorrect ? score + 1 : score;
+
     if (isCorrect) {
         playSound('success');
         setFeedbackState('correct');
-        setScore(prev => prev + 1);
+        setScore(nextScore);
         updateLife(2);
     } else {
         playSound('error');
@@ -86,22 +87,10 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
        if (qIndex + 1 < diagnosticQuestions.length) {
            setQIndex(prev => prev + 1);
        } else {
-           setPhase('result');
+           // Completion logic
+           onComplete(nextScore);
        }
     }, 600);
-  };
-
-  useEffect(() => {
-      if (phase === 'result') {
-          const timer = setTimeout(onComplete, 4500);
-          return () => clearTimeout(timer);
-      }
-  }, [phase, onComplete]);
-
-  const getPersona = () => {
-      if (score === 5) return { title: "GRAND ARCHMAGE", color: "text-magic-gold", desc: "Your mastery of time is absolute." };
-      if (score >= 3) return { title: "CHRONO-ADEPT", color: "text-mystic-blue", desc: "The talent is there, but training is required." };
-      return { title: "NOVICE APPRENTICE", color: "text-crimson", desc: "Dangerous instability detected." };
   };
 
   return (
@@ -137,14 +126,11 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
                 onTouchStart={(e) => { e.preventDefault(); startHolding(); }}
                 onTouchEnd={(e) => { e.preventDefault(); stopHolding(); }}
               >
-                 {/* The Crystal Ball */}
                  <motion.div 
                    className="w-48 h-48 rounded-full bg-gradient-to-br from-blue-200 to-indigo-600 dark:from-purple-900 dark:to-black shadow-[0_0_30px_rgba(75,0,130,0.5)] border-4 border-magic-gold/30 flex items-center justify-center relative overflow-hidden active:scale-95 transition-transform"
                    animate={isHolding ? { scale: 1.05, boxShadow: "0 0 60px #4b9cd3" } : { scale: 1 }}
                  >
-                    {/* Fog Effect inside ball */}
                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/foggy-birds.png')] opacity-50 animate-spin [animation-duration:10s]"></div>
-                    
                     {isHolding && (
                       <motion.div 
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -155,7 +141,6 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
                     )}
                  </motion.div>
                  
-                 {/* Magic Circle Progress */}
                  <svg className="absolute -top-6 -left-6 w-60 h-60 pointer-events-none rotate-spin-slow" viewBox="0 0 100 100">
                     <motion.circle 
                        cx="50" cy="50" r="46"
@@ -208,22 +193,6 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
                      </button>
                  ))}
              </div>
-          </motion.div>
-        )}
-
-        {phase === 'result' && (
-          <motion.div
-             key="result-ui"
-             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-             className="text-center z-20 px-4 bg-parchment dark:bg-obsidian p-10 rounded-lg border-4 border-magic-gold shadow-2xl mx-4"
-          >
-             <div className="mb-4 text-sm font-rune text-ink dark:text-parchment-dark">Attunement Complete</div>
-             <h1 className={`text-4xl md:text-6xl font-display font-bold mb-6 ${getPersona().color} drop-shadow-sm`}>
-               {getPersona().title}
-             </h1>
-             <p className="font-body text-xl italic text-ink dark:text-parchment">
-                {getPersona().desc}
-             </p>
           </motion.div>
         )}
 

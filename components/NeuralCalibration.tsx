@@ -30,7 +30,7 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
   useEffect(() => {
     if (showResult) {
         playSound('success');
-        const timer = setTimeout(onComplete, 4000);
+        const timer = setTimeout(onComplete, 3000);
         return () => clearTimeout(timer);
     }
   }, [showResult, onComplete]);
@@ -120,7 +120,7 @@ const NeuralCalibration: React.FC<NeuralProps> = ({ onComplete, updateLife }) =>
                 <motion.div 
                     initial={{ width: "0%" }}
                     animate={{ width: "100%" }}
-                    transition={{ duration: 4, ease: "linear" }}
+                    transition={{ duration: 3, ease: "linear" }}
                     className="h-full bg-magic-gold"
                 />
             </div>

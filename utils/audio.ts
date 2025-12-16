@@ -25,7 +25,7 @@ const createNoiseBuffer = (ctx: AudioContext) => {
   return buffer;
 };
 
-export const playSound = (type: 'success' | 'error' | 'click' | 'swipe' | 'tick') => {
+export const playSound = (type: 'success' | 'error' | 'click' | 'swipe' | 'tick' | 'level_complete') => {
   const ctx = getContext();
   if (!ctx) return;
   
@@ -47,11 +47,10 @@ export const playSound = (type: 'success' | 'error' | 'click' | 'swipe' | 'tick'
         osc.frequency.setValueAtTime(freq, now);
         
         gain.connect(masterGain);
-        // Staggered entry for "strumming" effect
         const start = now + (i * 0.05);
         gain.gain.setValueAtTime(0, start);
         gain.gain.linearRampToValueAtTime(0.05, start + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, start + 2.0); // Long tail
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + 2.0); 
         
         osc.connect(gain);
         osc.start(start);
@@ -59,8 +58,28 @@ export const playSound = (type: 'success' | 'error' | 'click' | 'swipe' | 'tick'
       });
       break;
 
+    case 'level_complete':
+      // "Harp Glissando": A rapid sequence of notes ascending
+      const scale = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25]; // C Major
+      scale.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle'; // Softer than sine
+        osc.frequency.setValueAtTime(freq, now);
+        
+        gain.connect(masterGain);
+        const start = now + (i * 0.1); // Slow strum
+        gain.gain.setValueAtTime(0, start);
+        gain.gain.linearRampToValueAtTime(0.1, start + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + 1.5);
+        
+        osc.connect(gain);
+        osc.start(start);
+        osc.stop(start + 1.5);
+      });
+      break;
+
     case 'error':
-      // "Dull Thud": Low frequency triangle wave, heavily filtered (Book closing sound)
       const errOsc = ctx.createOscillator();
       const errGain = ctx.createGain();
       const errFilter = ctx.createBiquadFilter();
@@ -84,7 +103,6 @@ export const playSound = (type: 'success' | 'error' | 'click' | 'swipe' | 'tick'
       break;
 
     case 'click':
-      // "Quill Scratch" / "Gem Tap": Very high pitch, extremely short sine
       const clickOsc = ctx.createOscillator();
       const clickGain = ctx.createGain();
       
@@ -103,7 +121,6 @@ export const playSound = (type: 'success' | 'error' | 'click' | 'swipe' | 'tick'
       break;
 
     case 'swipe':
-      // "Parchment Slide": Bandpass filtered noise
       const noiseSrc = ctx.createBufferSource();
       noiseSrc.buffer = createNoiseBuffer(ctx);
       const swipeFilter = ctx.createBiquadFilter();
@@ -127,7 +144,6 @@ export const playSound = (type: 'success' | 'error' | 'click' | 'swipe' | 'tick'
       break;
       
     case 'tick':
-      // "Clockwork / Woodblock": High sine with instant decay
       const tickOsc = ctx.createOscillator();
       const tickGain = ctx.createGain();
       

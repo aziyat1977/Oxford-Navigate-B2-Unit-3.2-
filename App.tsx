@@ -7,11 +7,35 @@ import NeuralCalibration from './components/NeuralCalibration';
 import TimeCapsule from './components/TimeCapsule';
 import PangeaSim from './components/PangeaSim';
 import Menu from './components/Menu';
+import CelebrationScreen from './components/CelebrationScreen';
+
+const pageVariants = {
+  initial: { opacity: 0, scale: 0.95, filter: "blur(5px)" },
+  animate: { opacity: 1, scale: 1, filter: "blur(0px)", transition: { duration: 0.5, ease: "easeOut" } },
+  exit: { opacity: 0, scale: 1.05, filter: "blur(5px)", transition: { duration: 0.3, ease: "easeIn" } }
+};
+
+const ViewWrapper = ({ children, k }: { children: React.ReactNode; k: string }) => (
+    <motion.div 
+        key={k} 
+        variants={pageVariants} 
+        initial="initial" 
+        animate="animate" 
+        exit="exit" 
+        className="absolute inset-0 w-full h-full overflow-hidden"
+    >
+        {children}
+    </motion.div>
+);
 
 const App = () => {
   const [currentView, setCurrentView] = useState('home');
   const [lifeExpectancy, setLifeExpectancy] = useState(40); 
   const [darkMode, setDarkMode] = useState(true);
+  
+  // Celebration State
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationData, setCelebrationData] = useState({ badge: '', title: '', subtitle: '', nextView: '' });
 
   useEffect(() => {
     if (darkMode) {
@@ -27,105 +51,171 @@ const App = () => {
     setLifeExpectancy(prev => Math.max(0, Math.min(100, prev + years)));
   };
 
-  // Transition variants for "Ultra Interactive" feel
-  const pageVariants = {
-    initial: { opacity: 0, scale: 0.9, filter: "blur(10px)" },
-    animate: { opacity: 1, scale: 1, filter: "blur(0px)", transition: { duration: 0.6, ease: "easeOut" } },
-    exit: { opacity: 0, scale: 1.1, filter: "blur(10px)", transition: { duration: 0.4, ease: "easeIn" } }
+  const handleLevelComplete = (nextViewId: string, customScore?: number) => {
+    // Define badges based on WHAT level just finished (currentView)
+    let data = { badge: '✨', title: 'Complete', subtitle: 'You have advanced.', nextView: nextViewId };
+
+    switch(currentView) {
+        case 'diagnostic':
+            let title = "Novice Apprentice";
+            let sub = "Dangerous instability detected.";
+            let badge = "⚡";
+            
+            if (customScore !== undefined) {
+               if (customScore >= 5) {
+                   title = "Grand Archmage";
+                   sub = "Your mastery of time is absolute.";
+                   badge = "🧙‍♂️";
+               } else if (customScore >= 3) {
+                   title = "Chrono-Adept";
+                   sub = "The talent is there, but training is required.";
+                   badge = "🔮";
+               }
+            }
+            data = { badge, title, subtitle: sub, nextView: nextViewId };
+            break;
+        case 'sorter':
+            data = { badge: '🃏', title: 'Fate Sorted', subtitle: 'Wisdom distinguishes investment from folly.', nextView: nextViewId };
+            break;
+        case 'timeline':
+            data = { badge: '📜', title: 'Scrolls Mastered', subtitle: 'The flow of time bends to your will.', nextView: nextViewId };
+            break;
+        case 'pangea':
+            data = { badge: '🌍', title: 'Realms United', subtitle: 'You have healed the fractured world.', nextView: nextViewId };
+            break;
+        case 'neural':
+            data = { badge: '🧠', title: 'Mind Sharp', subtitle: 'Your intellect rivals the Archmages.', nextView: nextViewId };
+            break;
+        default:
+            break;
+    }
+
+    setCelebrationData(data);
+    setShowCelebration(true);
   };
 
-  const renderView = () => {
+  const advanceLevel = () => {
+      setShowCelebration(false);
+      setCurrentView(celebrationData.nextView);
+  };
+
+  const renderContent = () => {
+    if (showCelebration) {
+        return (
+            <motion.div 
+                key="celebration" 
+                variants={pageVariants} 
+                initial="initial" 
+                animate="animate" 
+                exit="exit" 
+                className="absolute inset-0 z-20" // Absolute positioning to ensure overlap handling
+            >
+                <CelebrationScreen 
+                    badge={celebrationData.badge}
+                    title={celebrationData.title}
+                    subtitle={celebrationData.subtitle}
+                    onNext={advanceLevel}
+                />
+            </motion.div>
+        );
+    }
+
     switch(currentView) {
       case 'home':
         return (
-          <motion.div 
-            key="home" 
-            variants={pageVariants} initial="initial" animate="animate" exit="exit"
-            className="flex flex-col items-center justify-center h-full text-center p-4"
-          >
-             <h1 className="text-5xl md:text-8xl font-display font-bold text-ink dark:text-parchment mb-6 drop-shadow-lg">
-                The Chronomancer's<br/>Codex
-             </h1>
-             <p className="font-body text-2xl italic text-ink/80 dark:text-parchment/80 max-w-md mx-auto mb-10">
-               "Time is the currency of the soul.<br/>Spend it wisely, Apprentice."
-             </p>
-             <div className="w-24 h-24 border-4 border-magic-gold rounded-full flex items-center justify-center animate-pulse">
-                <span className="text-4xl">⏳</span>
-             </div>
-             <p className="mt-8 text-sm font-rune opacity-50 text-ink dark:text-parchment">Open the Grimoire (Top Left) to begin.</p>
-          </motion.div>
+          <ViewWrapper k="home">
+              <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                <h1 className="text-5xl md:text-8xl font-display font-bold text-ink dark:text-parchment mb-6 drop-shadow-lg">
+                    The Chronomancer's<br/>Codex
+                </h1>
+                <p className="font-body text-2xl italic text-ink/80 dark:text-parchment/80 max-w-md mx-auto mb-10">
+                "Time is the currency of the soul.<br/>Spend it wisely, Apprentice."
+                </p>
+                <div className="w-24 h-24 border-4 border-magic-gold rounded-full flex items-center justify-center animate-pulse">
+                    <span className="text-4xl">⏳</span>
+                </div>
+                <button 
+                    onClick={() => handleLevelComplete('diagnostic')}
+                    className="mt-12 px-8 py-3 bg-ink dark:bg-magic-gold text-parchment dark:text-ink font-display font-bold text-xl rounded-sm hover:scale-105 transition-transform"
+                >
+                    OPEN THE GRIMOIRE
+                </button>
+              </div>
+          </ViewWrapper>
         );
       case 'diagnostic':
         return (
-            <motion.div key="landing" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full w-full">
-                <Landing onComplete={() => setCurrentView('sorter')} updateLife={updateLife} />
-            </motion.div>
+            <ViewWrapper k="diagnostic">
+                <Landing onComplete={(score) => handleLevelComplete('sorter', score)} updateLife={updateLife} />
+            </ViewWrapper>
         );
       case 'sorter':
         return (
-            <motion.div key="sorter" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full w-full">
-                <AssetSorter onComplete={() => setCurrentView('timeline')} updateLife={updateLife} />
-            </motion.div>
+            <ViewWrapper k="sorter">
+                <AssetSorter onComplete={() => handleLevelComplete('timeline')} updateLife={updateLife} />
+            </ViewWrapper>
         );
       case 'timeline':
         return (
-            <motion.div key="timeline" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full w-full">
-                <TimelineGrammar onComplete={() => setCurrentView('pangea')} />
-            </motion.div>
+            <ViewWrapper k="timeline">
+                <TimelineGrammar onComplete={() => handleLevelComplete('pangea')} />
+            </ViewWrapper>
         );
       case 'pangea':
         return (
-            <motion.div key="pangea" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full w-full">
-                <PangeaSim onComplete={() => setCurrentView('neural')} />
-            </motion.div>
+            <ViewWrapper k="pangea">
+                <PangeaSim onComplete={() => handleLevelComplete('neural')} />
+            </ViewWrapper>
         );
       case 'neural':
         return (
-            <motion.div key="neural" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full w-full">
-                <NeuralCalibration onComplete={() => setCurrentView('capsule')} updateLife={updateLife} />
-            </motion.div>
+            <ViewWrapper k="neural">
+                <NeuralCalibration onComplete={() => handleLevelComplete('capsule')} updateLife={updateLife} />
+            </ViewWrapper>
         );
       case 'capsule':
         return (
-            <motion.div key="capsule" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full w-full">
+            <ViewWrapper k="capsule">
                 <TimeCapsule lifeExpectancy={lifeExpectancy} />
-            </motion.div>
+            </ViewWrapper>
         );
       default:
-        return null;
+        return (
+            <ViewWrapper k="error">
+                <div className="flex items-center justify-center h-full text-crimson">
+                    Unknown Temporal State
+                </div>
+            </ViewWrapper>
+        );
     }
   };
 
   return (
-    <main className={`min-h-screen overflow-hidden transition-colors duration-500 font-body
+    <main className={`relative w-full h-screen overflow-hidden transition-colors duration-500 font-body
       ${darkMode ? 'bg-obsidian text-parchment' : 'bg-parchment text-ink'}
       bg-paper-texture dark:bg-leather-texture`}>
       
       {/* Vignette Overlay */}
-      <div className="fixed inset-0 pointer-events-none z-50 shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]" />
+      <div className="absolute inset-0 pointer-events-none z-50 shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]" />
 
-      {/* Navigation & HUD */}
       <Menu currentView={currentView} setView={setCurrentView} darkMode={darkMode} toggleTheme={toggleTheme} />
 
-      {/* View Container */}
-      <div className="relative z-10 w-full h-screen">
+      {/* Main Content Area */}
+      <div className="relative w-full h-full z-10">
          <AnimatePresence mode="wait">
-            {renderView()}
+            {renderContent()}
          </AnimatePresence>
       </div>
 
-      {/* HUD: Sands of Time */}
-      {currentView !== 'home' && (
-        <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end pointer-events-none">
+      {currentView !== 'home' && !showCelebration && (
+        <div className="absolute bottom-6 right-6 z-40 flex flex-col items-end pointer-events-none">
              <div className="text-xs font-rune text-ink/60 dark:text-parchment/60 uppercase mb-1">Sands of Time</div>
              <motion.div 
                key={lifeExpectancy}
                initial={{ scale: 1.2 }}
                animate={{ 
                  scale: 1, 
-                 color: lifeExpectancy < 20 
-                   ? '#8a0303' // crimson
-                   : '#d4af37' // gold
+                 color: lifeExpectancy < 20 ? '#8a0303' : '#d4af37' 
                }}
                className="text-4xl font-display font-bold drop-shadow-md bg-black/20 px-4 py-2 rounded-lg backdrop-blur-sm border border-white/10"
              >
