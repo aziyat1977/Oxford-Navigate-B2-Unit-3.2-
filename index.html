@@ -2,7 +2,7 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>The Chronomancer's Codex</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Fantasy Fonts -->
@@ -61,9 +61,18 @@
       }
     </script>
     <style>
-      body {
-        overflow-x: hidden;
+      html, body {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        /* Prevent bounce on Mac/iOS */
+        overscroll-behavior: none;
+        /* Hardware acceleration for smooth scaling */
+        -webkit-font-smoothing: antialiased;
       }
+
       /* Vintage Paper Grain Overlay */
       .texture-overlay::before {
         content: "";
@@ -83,15 +92,7 @@
       }
       
       ::-webkit-scrollbar {
-        width: 10px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #2c1810;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #d4af37;
-        border: 2px solid #2c1810;
-        border-radius: 4px;
+        display: none;
       }
     </style>
   <script type="importmap">
@@ -107,7 +108,7 @@
 </script>
 </head>
   <body>
-    <div id="root" class="min-h-screen relative transition-colors duration-500 texture-overlay">
+    <div id="root" class="w-full h-full relative transition-colors duration-500 texture-overlay">
     </div>
   </body>
 </html>

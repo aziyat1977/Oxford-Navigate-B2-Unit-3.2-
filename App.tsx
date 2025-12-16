@@ -9,6 +9,74 @@ import PangeaSim from './components/PangeaSim';
 import Menu from './components/Menu';
 import CelebrationScreen from './components/CelebrationScreen';
 
+/**
+ * --- OMNI-RESOLUTION CALIBRATION ALGORITHM ---
+ * A precise hook that mathematically scales the interface to fit ANY display.
+ * It treats the viewport as a fixed canvas and adjusts the 'rem' unit 
+ * to maintain perfect relative proportions.
+ */
+const useOmniResolution = () => {
+  useEffect(() => {
+    const calibrate = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      
+      // Reference Dimensions (The "Ideal" Canvas)
+      const desktopBaseW = 1512; // MacBook Pro 14"
+      const desktopBaseH = 982;
+      const mobileBaseW = 390;   // iPhone 13/14
+      
+      let scaleFactor = 1;
+
+      if (w < h) {
+         // PORTRAIT MODE (Phones / Vertical Tablets)
+         // Algorithm: Lock to width to ensure text legibility, but check height to prevent overlaps.
+         scaleFactor = w / mobileBaseW;
+         
+         // Height Correction: If screen is unusually short (e.g. old phones with keyboard up)
+         // slightly reduce scale to fit vertical content.
+         const minAspect = 1.6; // Minimum height/width ratio expected
+         if (h / w < minAspect) {
+             scaleFactor *= 0.9;
+         }
+
+      } else {
+         // LANDSCAPE MODE (Desktops / Projectors / Smart Boards)
+         // Algorithm: 'Contain' Fit.
+         // We find the limiting dimension to ensure NO SCROLLING is ever needed.
+         const widthRatio = w / desktopBaseW;
+         const heightRatio = h / desktopBaseH;
+         
+         // Use the smaller ratio to ensure full fit
+         scaleFactor = Math.min(widthRatio, heightRatio);
+         
+         // Projector Boost: On massive 4k screens, bump it slightly for readability from distance
+         if (w > 2500) scaleFactor *= 1.1; 
+      }
+
+      // CLAMPING (Safety Protocols)
+      // Prevent microscopic text on watches or absurdly huge text on 8K walls
+      // Base 1rem = 16px. 
+      // Limits: 10px (Tiny) -> 64px (Giant)
+      const newRootSize = Math.max(10, Math.min(64, 16 * scaleFactor));
+      
+      // Apply to Root
+      document.documentElement.style.fontSize = `${newRootSize}px`;
+      
+      // Store Scale for JS logic if needed
+      document.documentElement.style.setProperty('--app-scale', `${scaleFactor}`);
+    };
+
+    // Active Listeners
+    window.addEventListener('resize', calibrate);
+    window.addEventListener('orientationchange', () => setTimeout(calibrate, 100)); // Delay for iOS rotation
+    calibrate(); // Initial Pulse
+
+    return () => window.removeEventListener('resize', calibrate);
+  }, []);
+};
+
+
 const pageVariants = {
   initial: { opacity: 0, scale: 0.95, filter: "blur(5px)" },
   animate: { opacity: 1, scale: 1, filter: "blur(0px)", transition: { duration: 0.5, ease: "easeOut" } },
@@ -22,13 +90,16 @@ const ViewWrapper = ({ children, k }: PropsWithChildren<{ k: string }>) => (
         initial="initial" 
         animate="animate" 
         exit="exit" 
-        className="absolute inset-0 w-full h-full overflow-hidden"
+        className="absolute inset-0 w-full h-full overflow-hidden flex flex-col"
     >
         {children}
     </motion.div>
 );
 
 const App = () => {
+  // Initialize the Resolution Algorithm
+  useOmniResolution();
+
   const [currentView, setCurrentView] = useState('home');
   const [lifeExpectancy, setLifeExpectancy] = useState(40); 
   const [darkMode, setDarkMode] = useState(true);
@@ -125,7 +196,7 @@ const App = () => {
         return (
           <ViewWrapper k="home">
               <div className="flex flex-col items-center justify-center h-full text-center p-4">
-                <h1 className="text-5xl md:text-8xl font-display font-bold text-ink dark:text-parchment mb-6 drop-shadow-lg">
+                <h1 className="text-5xl md:text-8xl font-display font-bold text-ink dark:text-parchment mb-6 drop-shadow-lg leading-tight">
                     The Chronomancer's<br/>Codex
                 </h1>
                 <p className="font-body text-2xl italic text-ink/80 dark:text-parchment/80 max-w-md mx-auto mb-10">
@@ -191,7 +262,7 @@ const App = () => {
   };
 
   return (
-    <main className={`relative w-full h-screen overflow-hidden transition-colors duration-500 font-body
+    <main className={`relative w-full h-full overflow-hidden transition-colors duration-500 font-body
       ${darkMode ? 'bg-obsidian text-parchment' : 'bg-parchment text-ink'}
       bg-paper-texture dark:bg-leather-texture`}>
       
