@@ -8,21 +8,10 @@ import TimeCapsule from './components/TimeCapsule';
 import PangeaSim from './components/PangeaSim';
 import Menu from './components/Menu';
 import CelebrationScreen from './components/CelebrationScreen';
+import KahootQuiz from './components/KahootQuiz';
 
 /**
  * --- OMNI-RESOLUTION CALIBRATION ALGORITHM V2 (ULTRA-PRECISION) ---
- * 
- * Mathematical Core:
- * This hook uses a ResizeObserver to monitor the exact pixel dimensions of the viewport.
- * It calculates a 'Scale Multiplier' by comparing the device's available space against
- * a 'Canonical Design Reference' (1600x900 for Landscape, 390x844 for Portrait).
- * 
- * The algorithm applies a "Contain" strategy:
- * Scale = Math.min(AvailableWidth / RefWidth, AvailableHeight / RefHeight)
- * 
- * This guarantees:
- * 1. ZERO SCROLLING: The app fits exactly within the bezels.
- * 2. UNIFORM DENSITY: Text and UI elements maintain visual weight across 4K and Mobile.
  */
 const useOmniResolution = () => {
   useEffect(() => {
@@ -31,54 +20,37 @@ const useOmniResolution = () => {
       const h = window.innerHeight;
       const aspect = w / h;
 
-      // Canonical References (The "Ideal" Canvas)
       const DESKTOP_REF = { w: 1600, h: 900 };
       const MOBILE_REF = { w: 390, h: 844 };
       
       let scale;
-      let baseSize = 16; // Base REM size in pixels
+      let baseSize = 16; 
 
       if (aspect > 1) {
-         // LANDSCAPE (Desktop, Projector, Tablet Horizontal)
-         // Calculate ratios
          const ratioW = w / DESKTOP_REF.w;
          const ratioH = h / DESKTOP_REF.h;
-         
-         // The 'Limiting Dimension' determines the scale to prevent overflow
          scale = Math.min(ratioW, ratioH);
-         
-         // Projector/4K Boost: If on a massive screen, we slightly boost legibility
          if (w > 2000) scale *= 1.1;
 
       } else {
-         // PORTRAIT (Phone, Tablet Vertical)
          const ratioW = w / MOBILE_REF.w;
          const ratioH = h / MOBILE_REF.h;
-         
-         // In portrait, width is usually the constraint, but we must respect height to avoid UI overlap
          scale = Math.min(ratioW, ratioH);
-         
-         // Ultra-Narrow Correction (e.g. Galaxy Fold folded)
          if (aspect < 0.5) scale *= 0.95; 
       }
 
-      // Clamp limits to preserve readability physics
-      // Min: 10px (prevents illegibility on watches)
-      // Max: 80px (prevents absurdity on stadium screens, though 4K projectors will use high values)
       const exactFontSize = Math.max(10, Math.min(80, baseSize * scale));
 
       document.documentElement.style.fontSize = `${exactFontSize}px`;
       document.documentElement.style.setProperty('--app-scale', `${scale}`);
     };
 
-    // ResizeObserver is more precise than window.resize as it fires on sub-pixel layout shifts
     const observer = new ResizeObserver(() => {
-       // Wrap in requestAnimationFrame to sync with screen refresh rate
        window.requestAnimationFrame(setScale);
     });
 
     observer.observe(document.body);
-    setScale(); // Initial Fire
+    setScale(); 
 
     return () => observer.disconnect();
   }, []);
@@ -105,14 +77,12 @@ const ViewWrapper = ({ children, k }: PropsWithChildren<{ k: string }>) => (
 );
 
 const App = () => {
-  // Initialize the Ultra-Precision Algorithm
   useOmniResolution();
 
   const [currentView, setCurrentView] = useState('home');
   const [lifeExpectancy, setLifeExpectancy] = useState(40); 
   const [darkMode, setDarkMode] = useState(true);
   
-  // Celebration State
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationData, setCelebrationData] = useState({ badge: '', title: '', subtitle: '', nextView: '' });
 
@@ -131,7 +101,6 @@ const App = () => {
   };
 
   const handleLevelComplete = (nextViewId: string, customScore?: number) => {
-    // Define badges based on WHAT level just finished (currentView)
     let data = { badge: '✨', title: 'Complete', subtitle: 'You have advanced.', nextView: nextViewId };
 
     switch(currentView) {
@@ -165,6 +134,12 @@ const App = () => {
         case 'neural':
             data = { badge: '🧠', title: 'Mind Sharp', subtitle: 'Your intellect rivals the Archmages.', nextView: nextViewId };
             break;
+        case 'capsule':
+            data = { badge: '🖋️', title: 'Legacy Sealed', subtitle: 'Your prophecy is written in the stars.', nextView: nextViewId };
+            break;
+        case 'kahoot':
+            data = { badge: '🏆', title: 'Arena Champion', subtitle: 'You have proven your worth in combat.', nextView: nextViewId };
+            break;
         default:
             break;
     }
@@ -187,7 +162,7 @@ const App = () => {
                 initial="initial" 
                 animate="animate" 
                 exit="exit" 
-                className="absolute inset-0 z-20" // Absolute positioning to ensure overlap handling
+                className="absolute inset-0 z-20" 
             >
                 <CelebrationScreen 
                     badge={celebrationData.badge}
@@ -258,7 +233,13 @@ const App = () => {
       case 'capsule':
         return (
             <ViewWrapper k="capsule">
-                <TimeCapsule lifeExpectancy={lifeExpectancy} />
+                <TimeCapsule lifeExpectancy={lifeExpectancy} onComplete={() => handleLevelComplete('kahoot')} />
+            </ViewWrapper>
+        );
+      case 'kahoot':
+        return (
+            <ViewWrapper k="kahoot">
+                <KahootQuiz onComplete={() => handleLevelComplete('home')} updateLife={updateLife} />
             </ViewWrapper>
         );
       default:
@@ -277,12 +258,10 @@ const App = () => {
       ${darkMode ? 'bg-obsidian text-parchment' : 'bg-parchment text-ink'}
       bg-paper-texture dark:bg-leather-texture`}>
       
-      {/* Vignette Overlay */}
       <div className="absolute inset-0 pointer-events-none z-50 shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]" />
 
       <Menu currentView={currentView} setView={setCurrentView} darkMode={darkMode} toggleTheme={toggleTheme} />
 
-      {/* Main Content Area */}
       <div className="relative w-full h-full z-10">
          <AnimatePresence mode="wait">
             {renderContent()}

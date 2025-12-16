@@ -16,6 +16,7 @@ const menuItems = [
   { id: 'timeline', label: 'IV. Prophecy Scrolls' },
   { id: 'neural', label: 'V. Trial of Wits' },
   { id: 'capsule', label: 'VI. Inscribe Legacy' },
+  { id: 'kahoot', label: 'VII. The Arena (Quiz)' },
 ];
 
 const Menu: React.FC<MenuProps> = ({ currentView, setView, darkMode, toggleTheme }) => {

@@ -5,9 +5,10 @@ import { playSound } from '../utils/audio';
 
 interface CapsuleProps {
     lifeExpectancy: number;
+    onComplete: () => void;
 }
 
-const TimeCapsule: React.FC<CapsuleProps> = ({ lifeExpectancy }) => {
+const TimeCapsule: React.FC<CapsuleProps> = ({ lifeExpectancy, onComplete }) => {
   const [text, setText] = useState("");
   const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(false);
@@ -83,16 +84,25 @@ const TimeCapsule: React.FC<CapsuleProps> = ({ lifeExpectancy }) => {
                 />
             </div>
             
-            <button 
-                onClick={handleSubmit}
-                disabled={loading || locked}
-                className={`w-full py-4 mt-8 font-display font-bold text-lg uppercase transition-all border-2 border-ink 
-                ${locked 
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                    : 'bg-crimson text-parchment hover:bg-ink hover:text-magic-gold shadow-lg'}`}
-            >
-                {loading ? "COMMUNING WITH ORACLE..." : locked ? "PROPHECY SEALED" : "SEAL PROPHECY"}
-            </button>
+            {/* Action Buttons */}
+            {!locked ? (
+                <button 
+                    onClick={handleSubmit}
+                    disabled={loading}
+                    className="w-full py-4 mt-8 font-display font-bold text-lg uppercase transition-all border-2 border-ink bg-crimson text-parchment hover:bg-ink hover:text-magic-gold shadow-lg"
+                >
+                    {loading ? "COMMUNING WITH ORACLE..." : "SEAL PROPHECY"}
+                </button>
+            ) : (
+                <motion.button 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    onClick={onComplete}
+                    className="w-full py-4 mt-8 font-display font-bold text-lg uppercase transition-all border-2 border-magic-gold bg-magic-gold text-obsidian hover:bg-white hover:text-black shadow-[0_0_20px_gold] animate-pulse"
+                >
+                    PROCEED TO THE ARENA →
+                </motion.button>
+            )}
 
             {/* Oracle Feedback */}
             {(feedback || loading) && (
