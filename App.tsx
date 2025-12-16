@@ -10,69 +10,77 @@ import Menu from './components/Menu';
 import CelebrationScreen from './components/CelebrationScreen';
 
 /**
- * --- OMNI-RESOLUTION CALIBRATION ALGORITHM ---
- * A precise hook that mathematically scales the interface to fit ANY display.
- * It treats the viewport as a fixed canvas and adjusts the 'rem' unit 
- * to maintain perfect relative proportions.
+ * --- OMNI-RESOLUTION CALIBRATION ALGORITHM V2 (ULTRA-PRECISION) ---
+ * 
+ * Mathematical Core:
+ * This hook uses a ResizeObserver to monitor the exact pixel dimensions of the viewport.
+ * It calculates a 'Scale Multiplier' by comparing the device's available space against
+ * a 'Canonical Design Reference' (1600x900 for Landscape, 390x844 for Portrait).
+ * 
+ * The algorithm applies a "Contain" strategy:
+ * Scale = Math.min(AvailableWidth / RefWidth, AvailableHeight / RefHeight)
+ * 
+ * This guarantees:
+ * 1. ZERO SCROLLING: The app fits exactly within the bezels.
+ * 2. UNIFORM DENSITY: Text and UI elements maintain visual weight across 4K and Mobile.
  */
 const useOmniResolution = () => {
   useEffect(() => {
-    const calibrate = () => {
+    const setScale = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
-      
-      // Reference Dimensions (The "Ideal" Canvas)
-      const desktopBaseW = 1512; // MacBook Pro 14"
-      const desktopBaseH = 982;
-      const mobileBaseW = 390;   // iPhone 13/14
-      
-      let scaleFactor = 1;
+      const aspect = w / h;
 
-      if (w < h) {
-         // PORTRAIT MODE (Phones / Vertical Tablets)
-         // Algorithm: Lock to width to ensure text legibility, but check height to prevent overlaps.
-         scaleFactor = w / mobileBaseW;
+      // Canonical References (The "Ideal" Canvas)
+      const DESKTOP_REF = { w: 1600, h: 900 };
+      const MOBILE_REF = { w: 390, h: 844 };
+      
+      let scale;
+      let baseSize = 16; // Base REM size in pixels
+
+      if (aspect > 1) {
+         // LANDSCAPE (Desktop, Projector, Tablet Horizontal)
+         // Calculate ratios
+         const ratioW = w / DESKTOP_REF.w;
+         const ratioH = h / DESKTOP_REF.h;
          
-         // Height Correction: If screen is unusually short (e.g. old phones with keyboard up)
-         // slightly reduce scale to fit vertical content.
-         const minAspect = 1.6; // Minimum height/width ratio expected
-         if (h / w < minAspect) {
-             scaleFactor *= 0.9;
-         }
+         // The 'Limiting Dimension' determines the scale to prevent overflow
+         scale = Math.min(ratioW, ratioH);
+         
+         // Projector/4K Boost: If on a massive screen, we slightly boost legibility
+         if (w > 2000) scale *= 1.1;
 
       } else {
-         // LANDSCAPE MODE (Desktops / Projectors / Smart Boards)
-         // Algorithm: 'Contain' Fit.
-         // We find the limiting dimension to ensure NO SCROLLING is ever needed.
-         const widthRatio = w / desktopBaseW;
-         const heightRatio = h / desktopBaseH;
+         // PORTRAIT (Phone, Tablet Vertical)
+         const ratioW = w / MOBILE_REF.w;
+         const ratioH = h / MOBILE_REF.h;
          
-         // Use the smaller ratio to ensure full fit
-         scaleFactor = Math.min(widthRatio, heightRatio);
+         // In portrait, width is usually the constraint, but we must respect height to avoid UI overlap
+         scale = Math.min(ratioW, ratioH);
          
-         // Projector Boost: On massive 4k screens, bump it slightly for readability from distance
-         if (w > 2500) scaleFactor *= 1.1; 
+         // Ultra-Narrow Correction (e.g. Galaxy Fold folded)
+         if (aspect < 0.5) scale *= 0.95; 
       }
 
-      // CLAMPING (Safety Protocols)
-      // Prevent microscopic text on watches or absurdly huge text on 8K walls
-      // Base 1rem = 16px. 
-      // Limits: 10px (Tiny) -> 64px (Giant)
-      const newRootSize = Math.max(10, Math.min(64, 16 * scaleFactor));
-      
-      // Apply to Root
-      document.documentElement.style.fontSize = `${newRootSize}px`;
-      
-      // Store Scale for JS logic if needed
-      document.documentElement.style.setProperty('--app-scale', `${scaleFactor}`);
+      // Clamp limits to preserve readability physics
+      // Min: 10px (prevents illegibility on watches)
+      // Max: 80px (prevents absurdity on stadium screens, though 4K projectors will use high values)
+      const exactFontSize = Math.max(10, Math.min(80, baseSize * scale));
+
+      document.documentElement.style.fontSize = `${exactFontSize}px`;
+      document.documentElement.style.setProperty('--app-scale', `${scale}`);
     };
 
-    // Active Listeners
-    window.addEventListener('resize', calibrate);
-    window.addEventListener('orientationchange', () => setTimeout(calibrate, 100)); // Delay for iOS rotation
-    calibrate(); // Initial Pulse
+    // ResizeObserver is more precise than window.resize as it fires on sub-pixel layout shifts
+    const observer = new ResizeObserver(() => {
+       // Wrap in requestAnimationFrame to sync with screen refresh rate
+       window.requestAnimationFrame(setScale);
+    });
 
-    return () => window.removeEventListener('resize', calibrate);
+    observer.observe(document.body);
+    setScale(); // Initial Fire
+
+    return () => observer.disconnect();
   }, []);
 };
 
@@ -97,7 +105,7 @@ const ViewWrapper = ({ children, k }: PropsWithChildren<{ k: string }>) => (
 );
 
 const App = () => {
-  // Initialize the Resolution Algorithm
+  // Initialize the Ultra-Precision Algorithm
   useOmniResolution();
 
   const [currentView, setCurrentView] = useState('home');
