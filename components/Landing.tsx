@@ -44,7 +44,7 @@ const Landing: React.FC<LandingProps> = ({ onComplete, updateLife }) => {
       setProgress((prev) => {
         const next = prev + 1.5; // Slightly faster for better UX
         if (next >= 100) {
-          playSound('success');
+          // Sound removed to silence start of diagnostic phase
           setPhase('diagnostic');
           return 100;
         }
