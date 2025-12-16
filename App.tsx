@@ -1,4 +1,4 @@
-import React, { useState, useEffect, PropsWithChildren } from 'react';
+import React, { useState, useEffect, PropsWithChildren, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Landing from './components/Landing';
 import AssetSorter from './components/AssetSorter';
@@ -11,48 +11,121 @@ import CelebrationScreen from './components/CelebrationScreen';
 import KahootQuiz from './components/KahootQuiz';
 
 /**
- * --- OMNI-RESOLUTION CALIBRATION ALGORITHM V2 (ULTRA-PRECISION) ---
+ * --- QUANTUM RESPONSIVE LAYOUT ENGINE V3.0 ---
+ * Ultra-precise, device-agnostic scaling algorithm.
+ * Adapts to: 4K Projectors, Smart Boards (4:3), Ultrawide Monitors,
+ * iPhones (SE to Max), iPads, and Laptops.
  */
-const useOmniResolution = () => {
+const useQuantumResponsiveLayout = () => {
+  // Use a ref to store the ResizeObserver so we can disconnect it later
+  const observerRef = useRef<ResizeObserver | null>(null);
+
   useEffect(() => {
-    const setScale = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const aspect = w / h;
+    const calibrate = () => {
+      // 1. Get exact hardware dimensions
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const aspect = width / height;
 
-      const DESKTOP_REF = { w: 1600, h: 900 };
-      const MOBILE_REF = { w: 390, h: 844 };
-      
-      let scale;
-      let baseSize = 16; 
+      // 2. Define Ideal Reference Frames
+      const REF_DESKTOP = { w: 1920, h: 1080 }; // Standard 1080p
+      const REF_MOBILE = { w: 390, h: 844 };   // Modern iPhone Base
 
-      if (aspect > 1) {
-         const ratioW = w / DESKTOP_REF.w;
-         const ratioH = h / DESKTOP_REF.h;
-         scale = Math.min(ratioW, ratioH);
-         if (w > 2000) scale *= 1.1;
+      let scaleFactor = 1;
+      let baseFontSize = 16;
+      let layoutMode = 'desktop';
+
+      // 3. The Algorithm
+      if (width > height) {
+        // --- LANDSCAPE MODE (Desktop, Laptop, Projector, Smart Board) ---
+        layoutMode = 'landscape';
+        
+        // Calculate scale based on both dimensions to ensure "Contain" fit
+        const scaleW = width / REF_DESKTOP.w;
+        const scaleH = height / REF_DESKTOP.h;
+        
+        // Use the smaller scale to prevent cutting off content
+        scaleFactor = Math.min(scaleW, scaleH);
+
+        // A. Smart Board / Projector Correction (4:3 Aspect Ratio)
+        // These screens are "taller" relative to width than 16:9.
+        if (aspect < 1.6) { 
+           // Slightly reduce scale to create breathing room on sides
+           scaleFactor *= 0.95; 
+        }
+
+        // B. 4K/Retina Projector Boost
+        // If pixels are dense, boost slightly for legibility at distance
+        if (width > 2500) {
+            scaleFactor *= 1.15; 
+        }
+
+        // Base calculation: 1920x1080 -> 18px base font
+        baseFontSize = 18 * scaleFactor;
 
       } else {
-         const ratioW = w / MOBILE_REF.w;
-         const ratioH = h / MOBILE_REF.h;
-         scale = Math.min(ratioW, ratioH);
-         if (aspect < 0.5) scale *= 0.95; 
+        // --- PORTRAIT MODE (Phone, Tablet) ---
+        layoutMode = 'portrait';
+
+        const scaleW = width / REF_MOBILE.w;
+        
+        // iPad / Tablet Correction
+        // Tablets have aspect ratios closer to 3:4 (0.75) vs Phones (0.45)
+        if (aspect > 0.6) {
+             // It's a tablet. Scale is usually too aggressive based on width alone.
+             // Dampen the scale factor.
+             scaleFactor = scaleW * 0.85;
+        } else {
+             // It's a phone. Scale linearly with width.
+             scaleFactor = scaleW;
+        }
+
+        // iPhone SE (Tiny Screen) Protection
+        if (width < 350) {
+            scaleFactor = Math.max(scaleFactor, 0.85); // Floor it so text doesn't vanish
+        }
+
+        baseFontSize = 16 * scaleFactor;
       }
 
-      const exactFontSize = Math.max(10, Math.min(80, baseSize * scale));
-
-      document.documentElement.style.fontSize = `${exactFontSize}px`;
-      document.documentElement.style.setProperty('--app-scale', `${scale}`);
+      // 4. Clamping & Precision Rounding
+      // We limit font size range to prevent absurdity (e.g. 200px text on 8K)
+      const clampedFontSize = Math.max(12, Math.min(100, baseFontSize));
+      
+      // 5. Apply to DOM
+      const doc = document.documentElement;
+      
+      // Font Size drives 'rem' units
+      doc.style.fontSize = `${clampedFontSize.toFixed(2)}px`;
+      
+      // CSS Variables for fine-tuning in components
+      doc.style.setProperty('--app-scale', scaleFactor.toFixed(3));
+      doc.style.setProperty('--app-width', `${width}px`);
+      doc.style.setProperty('--app-height', `${height}px`);
+      
+      // The "Mobile Address Bar" Fix: calculates true 1vh
+      doc.style.setProperty('--vh', `${height * 0.01}px`);
     };
 
-    const observer = new ResizeObserver(() => {
-       window.requestAnimationFrame(setScale);
+    // 6. Observation Strategy
+    // ResizeObserver is more performant and accurate than window.resize
+    observerRef.current = new ResizeObserver(() => {
+        // Debounce slightly with RequestAnimationFrame for smooth resizing
+        window.requestAnimationFrame(calibrate);
     });
 
-    observer.observe(document.body);
-    setScale(); 
+    observerRef.current.observe(document.body);
+    
+    // Initial Call
+    calibrate();
 
-    return () => observer.disconnect();
+    // Also listen to orientation change specifically for iOS
+    window.addEventListener('orientationchange', calibrate);
+
+    return () => {
+        if (observerRef.current) observerRef.current.disconnect();
+        window.removeEventListener('orientationchange', calibrate);
+    };
   }, []);
 };
 
@@ -71,13 +144,15 @@ const ViewWrapper = ({ children, k }: PropsWithChildren<{ k: string }>) => (
         animate="animate" 
         exit="exit" 
         className="absolute inset-0 w-full h-full overflow-hidden flex flex-col"
+        style={{ height: 'calc(var(--vh, 1vh) * 100)' }} // Applies the fix
     >
         {children}
     </motion.div>
 );
 
 const App = () => {
-  useOmniResolution();
+  // Initialize the Quantum Algorithm
+  useQuantumResponsiveLayout();
 
   const [currentView, setCurrentView] = useState('home');
   const [lifeExpectancy, setLifeExpectancy] = useState(40); 
@@ -254,9 +329,12 @@ const App = () => {
   };
 
   return (
-    <main className={`relative w-full h-full overflow-hidden transition-colors duration-500 font-body
+    <main 
+      className={`relative w-full overflow-hidden transition-colors duration-500 font-body
       ${darkMode ? 'bg-obsidian text-parchment' : 'bg-parchment text-ink'}
-      bg-paper-texture dark:bg-leather-texture`}>
+      bg-paper-texture dark:bg-leather-texture`}
+      style={{ height: 'calc(var(--vh, 1vh) * 100)' }} // Enforce true viewport height
+    >
       
       <div className="absolute inset-0 pointer-events-none z-50 shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]" />
 
