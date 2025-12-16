@@ -29,7 +29,9 @@ const Card: React.FC<CardProps> = ({ card, onSwipe, index }) => {
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-10, 10]);
   const opacity = useTransform(x, [-300, 0, 300], [0, 1, 0]);
-  const scale = useTransform(index, [0, 1, 2], [1, 0.95, 0.9]);
+  
+  // Fix: Calculate scale directly instead of using useTransform with a number
+  const scale = 1 - index * 0.05;
 
   const borderColor = useTransform(
     [x, y],
@@ -63,8 +65,10 @@ const Card: React.FC<CardProps> = ({ card, onSwipe, index }) => {
 
   return (
     <motion.div
-      style={{ x, y, rotate, opacity, scale, borderColor, zIndex: 100 - index }}
-      drag
+      style={{ x, y, rotate, opacity, borderColor, zIndex: 100 - index }}
+      animate={{ scale: scale }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      drag={index === 0} // Only allow dragging the top card
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={0.7}
       onDragEnd={handleDragEnd}
@@ -156,8 +160,8 @@ const AssetSorter: React.FC<AssetSorterProps> = ({ onComplete, updateLife }) => 
       <div className="relative w-72 h-[26rem] z-10">
          <AnimatePresence>
             {index < cardsData.length ? (
-                cardsData.slice(index).reverse().map((card, i) => (
-                    <Card key={index + (cardsData.length - 1 - i)} card={card} index={i} onSwipe={handleSwipe} />
+                cardsData.slice(index).map((card, i) => (
+                    <Card key={index + i} card={card} index={i} onSwipe={handleSwipe} />
                 ))
             ) : (
                 <motion.div 

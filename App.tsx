@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, PropsWithChildren } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Landing from './components/Landing';
 import AssetSorter from './components/AssetSorter';
@@ -15,7 +15,7 @@ const pageVariants = {
   exit: { opacity: 0, scale: 1.05, filter: "blur(5px)", transition: { duration: 0.3, ease: "easeIn" } }
 };
 
-const ViewWrapper = ({ children, k }: { children: React.ReactNode; k: string }) => (
+const ViewWrapper = ({ children, k }: PropsWithChildren<{ k: string }>) => (
     <motion.div 
         key={k} 
         variants={pageVariants} 
